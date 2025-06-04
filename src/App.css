@@ -1,2 +1,50 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap");
+
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
+}
+
+@theme {
+  --font-primary: "Inter", sans-serif; /* Clean, modern sans-serif */
+  --font-secondary: "Work Sans", sans-serif; /* Excellent readability for content */
+  --font-accent: "Poppins", sans-serif; /* Modern, distinctive for headlines */
+}
+
+@plugin "daisyui/theme" {
+  name: "light";
+  color-scheme: light;
+
+  --color-base-100: #ffffff; /* Clean white background */
+  --color-base-200: #f9f9f9; /* Subtle section separator */
+  --color-base-300: #eaeaea; /* Borders/dividers */
+  --color-base-content: #1e1e1e; /* Strong readable black text */
+
+  --color-primary: #f25c54; /* Vivid coral red – eye-catching and energetic */
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #ffa500; /* Bright orange – warm, vibrant */
+  --color-secondary-content: #1e1e1e;
+
+  --color-accent: #34c38f; /* Fresh mint green – energetic, modern */
+  --color-accent-content: #ffffff;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  color-scheme: dark;
+
+  --color-base-100: #121212; /* Deep background */
+  --color-base-200: #1f1f1f; /* Dark sectioning */
+  --color-base-300: #2a2a2a; /* Dividers */
+  --color-base-content: #f0f0f0; /* Light, readable text */
+
+  --color-primary: #ff6b61; /* Soft coral – keeps vibrancy without harshness */
+  --color-primary-content: #ffffff;
+
+  --color-secondary: #ffc75f; /* Warm amber – friendly and approachable */
+  --color-secondary-content: #1e1e1e;
+
+  --color-accent: #00c897; /* Teal green – modern and fresh */
+  --color-accent-content: #ffffff;
+}
