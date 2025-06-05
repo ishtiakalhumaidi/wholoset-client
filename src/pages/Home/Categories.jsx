@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CategoryCard from "../../components/ui/CategoryCard";
 import { HiOutlineDevicePhoneMobile } from "react-icons/hi2";
 import { GiClothes } from "react-icons/gi";
@@ -10,8 +10,13 @@ import {
   MdOutlineChair,
   MdOutlineSportsSoccer,
 } from "react-icons/md";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const Categories = () => {
+  useEffect(() => {
+    AOS.init({ once: true });
+  }, []);
   const categories = [
     { name: "Electronics & Gadgets", icon: HiOutlineDevicePhoneMobile },
     { name: "Apparel & Fashion", icon: GiClothes },
@@ -35,11 +40,9 @@ const Categories = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-6 max-w-10/12 mx-auto">
         {categories.map((category, index) => (
-          <CategoryCard
-            key={index}
-            name={category.name}
-            icon={category.icon}
-          />
+          <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
+            <CategoryCard name={category.name} icon={category.icon} />
+          </div>
         ))}
       </div>
     </div>
