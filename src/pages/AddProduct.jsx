@@ -18,7 +18,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-8 bg-white dark:bg-base-200 rounded-2xl shadow-xl">
+    <div className="max-w-5xl mx-auto p-8 my-10 bg-white dark:bg-base-200 rounded-2xl shadow-xl">
       <h2 className="text-4xl font-bold text-center text-primary mb-10 font-secondary">
         Submit New Product
       </h2>
@@ -35,7 +35,7 @@ const AddProduct = () => {
               type="url"
               {...register("image", { required: "Image URL is required" })}
               placeholder="https://example.com/image.jpg"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.image && (
               <span className="text-red-500 text-sm mt-1">
@@ -53,7 +53,7 @@ const AddProduct = () => {
               type="text"
               {...register("name", { required: "Product name is required" })}
               placeholder="e.g. Industrial Drill Machine"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.name && (
               <span className="text-red-500 text-sm mt-1">
@@ -76,7 +76,7 @@ const AddProduct = () => {
                 required: "Main quantity is required",
               })}
               placeholder="e.g. 100"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.mainQuantity && (
               <span className="text-red-500 text-sm mt-1">
@@ -96,7 +96,7 @@ const AddProduct = () => {
                 required: "Minimum quantity is required",
               })}
               placeholder="e.g. 10"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.minQuantity && (
               <span className="text-red-500 text-sm mt-1">
@@ -116,7 +116,7 @@ const AddProduct = () => {
               type="text"
               {...register("brand", { required: "Brand name is required" })}
               placeholder="e.g. Bunngle Ltd."
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.brand && (
               <span className="text-red-500 text-sm mt-1">
@@ -131,7 +131,7 @@ const AddProduct = () => {
             </span>
             <select
               {...register("category", { required: "Select a category" })}
-              className="select select-bordered w-full focus:outline-0 focus:border-accent"
+              className="select select-bordered w-full focus:outline-0 focus:border-accent rounded-xl"
               defaultValue=""
             >
               <option disabled value="">
@@ -164,7 +164,7 @@ const AddProduct = () => {
               maxLength: 300,
             })}
             placeholder="Briefly describe the product (max 300 chars)"
-            className="textarea textarea-bordered w-full focus:outline-0 focus:border-accent"
+            className="textarea textarea-bordered w-full focus:outline-0 focus:border-accent rounded-xl mb-2"
             rows={4}
           />
           {errors.description && (
@@ -185,7 +185,7 @@ const AddProduct = () => {
               step="0.01"
               {...register("price", { required: "Price is required" })}
               placeholder="e.g. 49.99"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.price && (
               <span className="text-red-500 text-sm mt-1">
@@ -209,7 +209,7 @@ const AddProduct = () => {
                 max: 5,
               })}
               placeholder="4.5"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
             />
             {errors.rating && (
               <span className="text-red-500 text-sm mt-1">

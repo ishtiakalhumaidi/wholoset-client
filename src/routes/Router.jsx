@@ -7,6 +7,7 @@ import AllProduct from "../pages/AllProduct";
 import AddProduct from "../pages/AddProduct";
 import MyProduct from "../pages/MyProduct";
 import CartPage from "../pages/CartPage";
+import ProductDetails from "../pages/ProductDetails";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: "my-cart",
         Component: CartPage,
+      },
+      {
+        path: "product-details/:id",
+        Component: ProductDetails,
       },
     ],
   },
