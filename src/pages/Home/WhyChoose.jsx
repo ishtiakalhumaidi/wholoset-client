@@ -10,7 +10,7 @@ const WhyChoose = () => {
   }, []);
   return (
     <section className="py-16 bg-base-100">
-      <h2 className="text-4xl md:text-6xl font-bold text-center text-primary mb-12 font-secondary">
+      <h2 className="text-4xl md:text-6xl font-bold text-center text-primary mb-12 ">
         Why Choose Wholoset
       </h2>
 

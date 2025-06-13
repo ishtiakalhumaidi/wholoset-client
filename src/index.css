@@ -6,9 +6,9 @@
 }
 
 @theme {
-  --font-primary: "Inter", sans-serif; /* Clean, modern sans-serif */
-  --font-secondary: "Work Sans", sans-serif; /* Excellent readability for content */
-  --font-accent: "Poppins", sans-serif; /* Modern, distinctive for headlines */
+  --font-primary: "Inter", sans-serif;
+  --font-secondary: "Work Sans", sans-serif;
+  --font-accent: "Poppins", sans-serif;
 }
 
 @plugin "daisyui/theme" {
@@ -48,18 +48,41 @@
   --color-accent: #00c897; /* Teal green – modern and fresh */
   --color-accent-content: #ffffff;
 }
-html{
+html {
   scroll-behavior: smooth;
 }
-a.active{
-  @apply bg-base-100 rounded-full font-semibold
+a.active {
+  @apply bg-base-content text-base-100 rounded-full font-semibold hover:text-base-content;
 }
-:root{
-  @apply font-primary
-} 
-.menu li{
-  @apply hover:bg-transparent border border-transparent hover:border-1 hover:border-base-content  rounded-full
+:root {
+  @apply font-primary;
 }
-.menu li a{
-  @apply hover:bg-transparent border border-transparent hover:border-1  rounded-full
+.menu li {
+  @apply hover:bg-transparent border border-transparent hover:border-1 hover:border-base-content  rounded-full;
+}
+.menu li a {
+  @apply hover:bg-transparent border border-transparent hover:border-1  rounded-full;
+}
+.btn :not .btn-outlin {
+  border: 0px;
+}
+h1,
+h2,
+h3 {
+  @apply font-accent;
+}
+.custom-swiper-nav .swiper-button-next,
+.custom-swiper-nav .swiper-button-prev {
+  @apply text-base-content;
+  padding: 8px;
+  height: 8px;
+  width: 8px;
+  transition: all 0.3s ease;
+}
+.swiper-button-prev {
+  margin-left: -6px;
+}
+.swiper-button-disabled {
+  opacity: 0;
+  pointer-events: none;
 }

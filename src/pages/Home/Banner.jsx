@@ -12,7 +12,7 @@ import { IoArrowDown } from "react-icons/io5";
 const Banner = () => {
   return (
     <div>
-      <div className="relative bg-gray-900">
+      <div className="relative bg-gray-900 -z-10">
         <div className="absolute inset-x-0 bottom-0">
           <svg
             viewBox="0 0 224 12"

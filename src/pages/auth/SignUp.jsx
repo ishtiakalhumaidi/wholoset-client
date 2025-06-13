@@ -1,7 +1,163 @@
 import React from "react";
+import { Link } from "react-router";
+import Lottie from "lottie-react";
+import signUpLottie from "../../assets/lotties/RegisterLottie.json";
+import { FcGoogle } from "react-icons/fc";
+import { useForm } from "react-hook-form";
 
 const SignUp = () => {
-  return <div></div>;
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    console.log("Form Data:", data);
+    // 🔐 Add your signup logic here (e.g. Firebase auth)
+  };
+
+  return (
+    <div className="my-10 md:my-26 flex flex-col lg:flex-row bg-base-100">
+      {/* Lottie Animation */}
+      <div className="lg:w-1/2 w-full hidden md:flex items-center justify-center p-10">
+        <div className="text-center">
+          <Lottie animationData={signUpLottie} style={{ height: "500px" }} />
+        </div>
+      </div>
+
+      {/* Form Section */}
+      <div className="lg:w-1/2 w-full flex items-center justify-center p-6">
+        <div className="w-full max-w-md space-y-6">
+          <h2 className="text-3xl font-bold text-center text-base-content">
+            Create an Account
+          </h2>
+
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col gap-4"
+          >
+            {/* Full Name */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-base-content">Full Name</span>
+              </label>
+              <input
+                type="text"
+                placeholder="John Doe"
+                className="input border-base-content w-full focus:outline-0 focus:border-accent"
+                {...register("fullName", { required: "Full Name is required" })}
+              />
+              {errors.fullName && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.fullName.message}
+                </p>
+              )}
+            </div>
+
+            {/* photoURL */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-base-content">Photo URL</span>
+              </label>
+              <input
+                {...register("photoURL", {
+                  required: "Photo URL is required",
+                  pattern: {
+                    value: /^https:\/\/.+/i,
+                    message: "Please enter a valid image URL.",
+                  },
+                })}
+                type="url"
+                placeholder="https://example.com/photo.jpg"
+                className="input border-base-content w-full focus:outline-0 focus:border-accent"
+              />
+
+              {errors.photoURL && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.photoURL.message}
+                </p>
+              )}
+            </div>
+            {/* Email */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-base-content">
+                  Email address
+                </span>
+              </label>
+              <input
+                type="email"
+                placeholder="you@example.com"
+                className="input border-base-content w-full focus:outline-0 focus:border-accent"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^\S+@\S+\.\S+$/,
+                    message: "Enter a valid email",
+                  },
+                })}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text text-base-content">Password</span>
+              </label>
+              <input
+                type="password"
+                placeholder="Create a password"
+                className="input border-base-content w-full focus:outline-0 focus:border-accent"
+                {...register("password", {
+                  required: "Password is required",
+                  pattern: {
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$/,
+                    message:
+                      "Password must be at least 6 characters long and include at least one uppercase, one lowercase, and one special character.",
+                  },
+                })}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="btn bg-base-content text-base-100 w-full text-base font-semibold"
+            >
+              Sign Up
+            </button>
+          </form>
+
+          <div className="divider">Or sign up with</div>
+
+          <button className="btn btn-outline w-full gap-2 hover:shadow-md">
+            <FcGoogle className="text-xl" />
+            Sign up with Google
+          </button>
+
+          <p className="text-center text-sm">
+            Already have an account?{" "}
+            <Link
+              to="/sign-in"
+              className="link link-hover text-accent font-medium"
+            >
+              Sign in
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default SignUp;

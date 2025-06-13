@@ -4,9 +4,9 @@ import React from "react";
 const ProductCard = () => {
   return (
     <div className="max-w-sm rounded-xl overflow-hidden shadow-lg bg-base-100 border border-base-300">
-      <figure className="bg-primary p-4">
+      <figure className=" p-4 pb-0">
         <img
-          src="https://via.placeholder.com/300x200"
+          src="https://cdn11.bigcommerce.com/s-21x65e8kfn/images/stencil/original/products/70526/359688/UND9194_1000_11__50731.1747992022.jpg"
           alt="Product Image"
           className="w-full object-cover h-48 rounded-lg"
         />
