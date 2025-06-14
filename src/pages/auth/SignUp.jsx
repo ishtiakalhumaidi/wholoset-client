@@ -1,11 +1,16 @@
-import React from "react";
-import { Link } from "react-router";
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import Lottie from "lottie-react";
 import signUpLottie from "../../assets/lotties/RegisterLottie.json";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const SignUp = () => {
+  const { googleLogIn, isLoading, createUser, updateUserData } =
+    useContext(AuthContext);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -13,8 +18,33 @@ const SignUp = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    // 🔐 Add your signup logic here (e.g. Firebase auth)
+    const { email, password, ...rest } = data;
+    console.log(email, password, rest);
+    createUser(email, password)
+      .then((result) => {
+        updateUserData(rest.fullName, rest.photoURL)
+          .then(() => {
+            navigate("/");
+          })
+          .catch((error) => {
+            console.log(error.code);
+          });
+      })
+      .catch((error) => {
+        console.log(error.code);
+      });
+  };
+
+  // googleSignUp
+  const googleSignUp = () => {
+    setError(null);
+    googleLogIn()
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        setError(error.code);
+      });
   };
 
   return (
@@ -140,9 +170,14 @@ const SignUp = () => {
 
           <div className="divider">Or sign up with</div>
 
-          <button className="btn btn-outline w-full gap-2 hover:shadow-md">
+          <button
+            onClick={googleSignUp}
+            className="btn btn-outline w-full gap-2 hover:shadow-md"
+          >
             <FcGoogle className="text-xl" />
-            Sign up with Google
+            {isLoading && !error
+              ? "Signing up with Google..."
+              : "Sign up with Google"}
           </button>
 
           <p className="text-center text-sm">

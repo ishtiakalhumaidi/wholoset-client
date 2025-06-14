@@ -31,7 +31,7 @@ const Categories = () => {
     <div id="categories" className="max-w-11/12 mx-auto my-20">
       <div className="flex flex-col justify-center items-center text-center ">
         <h2 className="text-4xl md:text-6xl font-bold text-primary mb-2 ">
-          Explore Our Product Categories
+          Explore Our Product by Categories
         </h2>
         <p className="text-content text-lg max-w-2xl mx-auto mb-10">
           From industrial machinery to fashion and gadgets — discover

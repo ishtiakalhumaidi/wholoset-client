@@ -1,12 +1,26 @@
-import React from "react";
+import React, { useContext } from "react";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { LuArrowUpRight } from "react-icons/lu";
 import { Link, NavLink, useLocation } from "react-router";
 import { Slide } from "react-awesome-reveal";
 import { FiShoppingCart } from "react-icons/fi";
+import { AuthContext } from "../../contexts/AuthContext";
+import { FaRegCircleUser } from "react-icons/fa6";
 
 const NavBar = () => {
   const location = useLocation();
+  const { user, logOut } = useContext(AuthContext);
+
+  const handleLogOut = () => {
+    logOut()
+      .then(() => {
+        console.log("Sign-out successful.");
+      })
+      .catch((error) => {
+        console.log(error.code);
+      });
+  };
+
   // console.log(location);
   const navLinks = (
     <>
@@ -133,49 +147,60 @@ const NavBar = () => {
               {/* themeToggle */}
               <ThemeToggle />
 
-              <Link
-                to={"sign-in"}
-                className="btn btn-outline hover:bg-base-content hover:text-base-100 rounded-full font-accent hidden sm:flex"
-              >
-                Sign In
-              </Link>
-              <Link
-                to={"sign-up"}
-                className="btn bg-base-content text-base-100 hover:bg-base-100 hover:text-base-content rounded-full font-accent  "
-              >
-                Sign Up
-              </Link>
-              <div className="dropdown dropdown-end ">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="btn btn-ghost btn-circle avatar"
-                >
-                  <div className="w-10 rounded-full">
-                    <img
-                      alt="Tailwind CSS Navbar component"
-                      src="https://www.svgrepo.com/show/524199/user-circle.svg"
-                    />
+              {!user && (
+                <>
+                  <Link
+                    to={"sign-in"}
+                    className="btn btn-outline hover:bg-base-content hover:text-base-100 rounded-full font-accent hidden sm:flex"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to={"sign-up"}
+                    className="btn bg-base-content text-base-100 hover:bg-base-100 hover:text-base-content rounded-full font-accent  "
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+              {user && (
+                <div className="dropdown dropdown-end ">
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-ghost btn-circle avatar"
+                  >
+                    <div className="w-10 rounded-full">
+                      {user?.photoURL ? (
+                        <img
+                          referrerPolicy="no-referrer"
+                          alt={user?.displayName || "User"}
+                          src={user.photoURL}
+                        />
+                      ) : (
+                        <FaRegCircleUser className="w-full h-full" />
+                      )}
+                    </div>
                   </div>
+                  <ul
+                    tabIndex={0}
+                    className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow z-50"
+                  >
+                    <li>
+                      <a className="justify-between">
+                        Profile
+                        <span className="badge">New</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a>Settings</a>
+                    </li>
+                    <li onClick={handleLogOut}>
+                      <a>Logout</a>
+                    </li>
+                  </ul>
                 </div>
-                <ul
-                  tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow z-50"
-                >
-                  <li>
-                    <a className="justify-between">
-                      Profile
-                      <span className="badge">New</span>
-                    </a>
-                  </li>
-                  <li>
-                    <a>Settings</a>
-                  </li>
-                  <li>
-                    <a>Logout</a>
-                  </li>
-                </ul>
-              </div>
+              )}
             </div>
           </div>
         </div>

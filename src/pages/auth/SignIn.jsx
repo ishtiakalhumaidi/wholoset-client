@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router";
 import signInLottie from "../../assets/lotties/LogInLottie.json";
 import Lottie from "lottie-react";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const SignIn = () => {
+  const { user, logIn, googleLogIn, isLoading } = useContext(AuthContext);
+  const [error, setError] = useState(null);
   const {
     register,
     handleSubmit,
@@ -14,7 +17,24 @@ const SignIn = () => {
 
   const onSubmit = (data) => {
     console.log("Form Data:", data);
-    
+    logIn(data.email, data.password)
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        console.log(error.code);
+      });
+  };
+
+  const googleSignIn = () => {
+    setError(null);
+    googleLogIn()
+      .then((result) => {
+        console.log(result.user);
+      })
+      .catch((error) => {
+        setError(error.code);
+      });
   };
 
   return (
@@ -98,9 +118,14 @@ const SignIn = () => {
 
           <div className="divider">Or continue with</div>
 
-          <button className="btn btn-outline w-full gap-2 hover:shadow-md">
+          <button
+            onClick={googleSignIn}
+            className="btn btn-outline w-full gap-2 hover:shadow-md"
+          >
             <FcGoogle className="text-xl" />
-            Sign in with Google
+            {isLoading && !error
+              ? "Signing in with Google..."
+              : "Sign in with Google"}
           </button>
 
           <p className="text-center text-sm">
