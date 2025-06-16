@@ -5,6 +5,7 @@ import Lottie from "lottie-react";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../contexts/AuthContext";
+import axios from "axios";
 
 const SignIn = () => {
   const { user, logIn, googleLogIn, isLoading } = useContext(AuthContext);
@@ -30,6 +31,20 @@ const SignIn = () => {
     setError(null);
     googleLogIn()
       .then((result) => {
+        const data = {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+        };
+
+        axios
+          .post("http://localhost:3000/users", data)
+          .then((res) => {
+            console.log("User saved:", res.data);
+          })
+          .catch((err) => {
+            console.error("User didn't add", err);
+          });
         console.log(result.user);
       })
       .catch((error) => {

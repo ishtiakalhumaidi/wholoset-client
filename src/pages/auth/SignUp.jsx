@@ -5,6 +5,7 @@ import signUpLottie from "../../assets/lotties/RegisterLottie.json";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../contexts/AuthContext";
+import axios from "axios";
 
 const SignUp = () => {
   const { googleLogIn, isLoading, createUser, updateUserData } =
@@ -17,29 +18,51 @@ const SignUp = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    const { email, password, ...rest } = data;
-    console.log(email, password, rest);
-    createUser(email, password)
-      .then((result) => {
-        updateUserData(rest.fullName, rest.photoURL)
-          .then(() => {
-            navigate("/");
-          })
-          .catch((error) => {
-            console.log(error.code);
-          });
-      })
-      .catch((error) => {
-        console.log(error.code);
-      });
-  };
+ const onSubmit = (data) => {
+  const { email, password, fullName, photoURL } = data;
+
+  createUser(email, password)
+    .then(() => {
+      return updateUserData(fullName, photoURL);
+    })
+    .then(() => {
+      const userData = {
+        displayName: fullName,
+        email,
+        photoURL,
+      };
+      return axios.post("http://localhost:3000/users", userData);
+    })
+    .then((res) => {
+      console.log("User saved:", res.data);
+      navigate("/");
+    })
+    .catch((error) => {
+      console.error("Error:", error.code || error.message);
+    });
+};
+
 
   // googleSignUp
   const googleSignUp = () => {
     setError(null);
     googleLogIn()
       .then((result) => {
+        const data = {
+          displayName: result.user.displayName,
+          email: result.user.email,
+          photoURL: result.user.photoURL,
+        };
+
+        axios
+          .post("http://localhost:3000/users", data)
+          .then((res) => {
+            console.log("User saved:", res.data);
+          })
+          .catch((err) => {
+            console.error("User didn't add", err);
+          });
+
         console.log(result.user);
       })
       .catch((error) => {

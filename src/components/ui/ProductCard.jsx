@@ -1,84 +1,86 @@
 import React from "react";
+import { Link } from "react-router";
 // import ReactStars from "react-rating-stars-component";
 
-const ProductCard = () => {
+const ProductCard = ({ product }) => {
+  const {
+    brand,
+    category,
+    description,
+    image,
+    minQuantity,
+    name,
+    price,
+    rating,
+    oldPrice,
+    discount,
+  } = product;
+
+
+
+  
   return (
-    <div className="max-w-sm rounded-xl overflow-hidden shadow-lg bg-base-100 border border-base-300">
+    <div className="max-w-sm rounded-xl overflow-hidden shadow-lg bg-base-100 border border-base-300 hover:scale-103 duration-700 my-2">
       <figure className=" p-4 pb-0">
         <img
-          src="https://cdn11.bigcommerce.com/s-21x65e8kfn/images/stencil/original/products/70526/359688/UND9194_1000_11__50731.1747992022.jpg"
+          src={image}
           alt="Product Image"
           className="w-full object-cover h-48 rounded-lg"
         />
       </figure>
       <div className="p-5 space-y-2">
-        <h2 className="text-xl font-bold text-base-content">Elite Sports Shoes</h2>
+        <h2 className="text-xl font-bold text-base-content">{name}</h2>
         <p className="text-sm text-base-content">
-          <span className="font-medium">Brand:</span> Nike
-        </p>
-        <p className="text-sm text-base-content">
-          <span className="font-medium">Category:</span> Athletic Footwear
+          <span className="font-medium">Brand:</span> {brand}
         </p>
         <p className="text-sm text-base-content">
-          <span className="font-medium">Min Qty:</span> 10 pairs
+          <span className="font-medium">Category:</span> {category}
         </p>
-        <p className="text-sm text-base-content mt-1">
-          High-performance running shoes designed for durability, speed, and
-          comfort — ideal for bulk purchase.
+        <p className="text-sm text-base-content">
+          <span className="font-medium">Min Qty:</span> {minQuantity} pairs
         </p>
+        <p className="text-sm text-base-content mt-1">{description}</p>
         <div className="mt-2">
-          <p className="text-lg font-semibold text-accent">$25.00 / pair</p>
+          <p className="text-lg font-semibold text-accent">
+            ${price.toFixed(2)} / pair
+          </p>
           <div className="flex items-center gap-1">
             {" "}
-            <p className="line-through text-sm text-gray-400">$30.00 </p>{" "}
-            <span className="badge badge-primary badge-sm ">Save 17%</span>
+            <p className="line-through text-sm text-gray-400">
+              ${oldPrice.toFixed(2)}{" "}
+            </p>{" "}
+            <span className="badge badge-primary badge-sm ">
+              Save {parseFloat(discount).toFixed(1)}%
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-1 mt-2">
           <div className="rating rating-sm">
-            <input
-              type="radio"
-              name="rating-1"
-              className="mask mask-star-2 bg-yellow-400"
-              checked
-              readOnly
-            />
-            <input
-              type="radio"
-              name="rating-1"
-              className="mask mask-star-2 bg-yellow-400"
-              checked
-              readOnly
-            />
-            <input
-              type="radio"
-              name="rating-1"
-              className="mask mask-star-2 bg-yellow-400"
-              checked
-              readOnly
-            />
-            <input
-              type="radio"
-              name="rating-1"
-              className="mask mask-star-2 bg-yellow-400"
-              readOnly
-            />
-            <input
-              type="radio"
-              name="rating-1"
-              className="mask mask-star-2 bg-yellow-400"
-              readOnly
-            />
+            {[...Array(5)].map((_, index) => (
+              <input
+                key={index}
+                type="radio"
+                name={`rating-${name}`}
+                className={`mask mask-star-2 opacity-100 ${
+                  index < parseInt(rating) ? "bg-yellow-400 " : "bg-base-300"
+                }`}
+                readOnly
+                disabled
+              />
+            ))}
           </div>
-          <span className="text-sm text-gray-500 ml-1">4.2 (15k reviews)</span>
+
+          <span className="text-sm text-gray-500 ml-1">
+            {rating} (15k reviews)
+          </span>
         </div>
         <div className="mt-4 flex gap-2">
-          <button className="btn btn-secondary rounded-l-2xl border-none flex-1">
-            Add to Cart
-          </button>
-          <button className="btn btn-outline btn-accent rounded-r-2xl">
+          <Link
+            to={`/product-details/${product._id}`}
+            className="btn btn-outline btn-accent rounded-lg w-full"
+          >
             Details
-          </button>
+          </Link>
         </div>
       </div>
     </div>

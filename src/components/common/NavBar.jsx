@@ -21,15 +21,11 @@ const NavBar = () => {
       });
   };
 
-  // console.log(location);
   const navLinks = (
     <>
       <li>
         <NavLink to={"/"}>Home</NavLink>
       </li>
-      {/* <li>
-        <a href="#categories">Categories</a>
-      </li> */}
       <li>
         <NavLink to={"/all-product"}>All product</NavLink>
       </li>
@@ -44,10 +40,12 @@ const NavBar = () => {
 
   return (
     <div
-      className={`${location.pathname == "/" ? "bg-gray-900" : "bg-base-100"}`}
+      className={`${
+        location.pathname === "/" ? "bg-gray-900" : "bg-base-100"
+      } relative z-[50]`}
     >
       <Slide direction="down" cascade triggerOnce>
-        <div className="bg-base-300 rounded-b-4xl sm:rounded-b-full">
+        <div className="bg-base-300 rounded-b-4xl sm:rounded-b-full relative z-[50]">
           <div className="navbar w-11/12 mx-auto">
             <div className="navbar-start">
               <div className="dropdown">
@@ -63,33 +61,32 @@ const NavBar = () => {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    {" "}
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       strokeWidth="2"
                       d="M4 6h16M4 12h8m-8 6h16"
-                    />{" "}
+                    />
                   </svg>
                 </div>
                 <ul
                   tabIndex={0}
-                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+                  className="menu menu-sm dropdown-content bg-base-100 rounded-box z-[100] mt-3 w-52 p-2 shadow"
                 >
                   {navLinks}
                 </ul>
               </div>
-              <Link to={"/"} className="text-2xl font-primary  font-extrabold">
+              <Link to={"/"} className="text-2xl font-primary font-extrabold">
                 Wholoset
               </Link>
             </div>
             <div className="navbar-center hidden lg:flex">
-              <ul className="menu menu-horizontal border-2 gap-2  rounded-full">
+              <ul className="menu menu-horizontal border-2 gap-2 rounded-full">
                 {navLinks}
               </ul>
             </div>
             <div className="navbar-end gap-2">
-              {/* cart */}
+              {/* Cart */}
               <div className="dropdown dropdown-end">
                 <div
                   tabIndex={0}
@@ -103,10 +100,9 @@ const NavBar = () => {
                     </span>
                   </div>
                 </div>
-
                 <div
                   tabIndex={0}
-                  className="mt-3 z-10 card dropdown-content w-72 bg-base-100 shadow-lg border border-base-200"
+                  className="mt-3 card dropdown-content w-72 bg-base-100 shadow-lg border border-base-200 z-[100]"
                 >
                   <div className="card-body space-y-2">
                     <div className="flex justify-between items-center">
@@ -117,7 +113,6 @@ const NavBar = () => {
                         Subtotal: <strong>$999</strong>
                       </span>
                     </div>
-
                     <ul className="text-sm text-base-content space-y-1">
                       <li className="flex justify-between">
                         <span>Sports Shoes</span>
@@ -131,7 +126,6 @@ const NavBar = () => {
                         +6 more items
                       </li>
                     </ul>
-
                     <div className="card-actions">
                       <Link
                         to={"my-cart"}
@@ -143,10 +137,8 @@ const NavBar = () => {
                   </div>
                 </div>
               </div>
-
-              {/* themeToggle */}
+              {/* ThemeToggle */}
               <ThemeToggle />
-
               {!user && (
                 <>
                   <Link
@@ -157,14 +149,14 @@ const NavBar = () => {
                   </Link>
                   <Link
                     to={"sign-up"}
-                    className="btn bg-base-content text-base-100 hover:bg-base-100 hover:text-base-content rounded-full font-accent  "
+                    className="btn bg-base-content text-base-100 hover:bg-base-100 hover:text-base-content rounded-full font-accent"
                   >
                     Sign Up
                   </Link>
                 </>
               )}
               {user && (
-                <div className="dropdown dropdown-end ">
+                <div className="dropdown dropdown-end">
                   <div
                     tabIndex={0}
                     role="button"
@@ -184,7 +176,7 @@ const NavBar = () => {
                   </div>
                   <ul
                     tabIndex={0}
-                    className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow z-50"
+                    className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow z-[100]"
                   >
                     <li>
                       <a className="justify-between">

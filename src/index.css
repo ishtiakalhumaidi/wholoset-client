@@ -4,7 +4,9 @@
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark;
 }
-
+/* * {
+  outline: 1px solid red !important;
+} */
 @theme {
   --font-primary: "Inter", sans-serif;
   --font-secondary: "Work Sans", sans-serif;

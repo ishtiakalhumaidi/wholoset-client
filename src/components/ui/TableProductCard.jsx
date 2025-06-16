@@ -1,12 +1,25 @@
 import React from "react";
+import { Link } from "react-router";
 
-const TableProductCard = () => {
+const TableProductCard = ({ product }) => {
+  const {
+    brand,
+    category,
+    description,
+    image,
+    minQuantity,
+    name,
+    price,
+    rating,
+    oldPrice,
+    discount,
+  } = product;
   return (
     <tr className="bg-base-100 border-b border-base-300">
       {/* Image */}
       <td className="p-4">
         <img
-          src="https://cdn11.bigcommerce.com/s-21x65e8kfn/images/stencil/original/products/70526/359688/UND9194_1000_11__50731.1747992022.jpg"
+          src={image}
           alt="Product"
           className="w-28 h-28 object-cover rounded-lg"
         />
@@ -14,79 +27,57 @@ const TableProductCard = () => {
 
       {/* Product Info */}
       <td className="p-4 space-y-1">
-        <h2 className="text-lg font-bold text-base-content">
-          Elite Sports Shoes
+        <h2 className="text-base sm:text-lg font-bold text-base-content">
+          {name}
         </h2>
         <p className="text-sm">
-          <span className="font-medium">Brand:</span> Nike
+          <span className="font-medium">Brand:</span> {brand}
         </p>
         <p className="text-sm">
-          <span className="font-medium">Category:</span> Athletic Footwear
+          <span className="font-medium">Category:</span> {category}
         </p>
         <p className="text-sm">
-          <span className="font-medium">Min Qty:</span> 10 pairs
+          <span className="font-medium">Min Qty:</span> {minQuantity} pairs
         </p>
-        <p className="text-xs text-gray-500">
-          High-performance running shoes designed for durability, speed, and
-          comfort.
-        </p>
+        <p className="text-xs text-gray-500">{description}</p>
       </td>
 
       {/* Pricing */}
       <td className="p-4 text-center">
-        <p className="text-base font-semibold text-accent">$25.00 / pair</p>
-        <p className="text-sm line-through text-gray-400">$30.00</p>
-        <span className="badge badge-primary badge-sm mt-1">Save 17%</span>
+        <p className="text-base font-semibold text-accent">${price} / pair</p>
+        <p className="text-sm line-through text-gray-400">${oldPrice}</p>
+        <span className="badge badge-primary badge-sm py-4 sm:py-2 mt-1">
+          Save {discount}%
+        </span>
       </td>
 
       {/* Rating */}
       <td className="p-4 text-center">
         <div className="rating rating-sm justify-center">
-          <input
-            type="radio"
-            name="rating-1"
-            className="mask mask-star-2 bg-yellow-400"
-            checked
-            readOnly
-          />
-          <input
-            type="radio"
-            name="rating-1"
-            className="mask mask-star-2 bg-yellow-400"
-            checked
-            readOnly
-          />
-          <input
-            type="radio"
-            name="rating-1"
-            className="mask mask-star-2 bg-yellow-400"
-            checked
-            readOnly
-          />
-          <input
-            type="radio"
-            name="rating-1"
-            className="mask mask-star-2 bg-yellow-400"
-            readOnly
-          />
-          <input
-            type="radio"
-            name="rating-1"
-            className="mask mask-star-2 bg-yellow-400"
-            readOnly
-          />
+          {[...Array(5)].map((_, index) => (
+            <input
+              key={index}
+              type="radio"
+              name={`rating-${name}`}
+              className={`mask mask-star-2 opacity-100 ${
+                index < parseInt(rating) ? "bg-yellow-400 " : "bg-base-300"
+              }`}
+              readOnly
+              disabled
+            />
+          ))}
         </div>
-        <p className="text-xs text-gray-500 mt-1">4.2 (15k)</p>
+        <p className="text-xs text-gray-500 mt-1">{rating} (15k)</p>
       </td>
 
       {/* Actions */}
       <td className="p-4 text-right space-x-2">
-        <button className="btn btn-sm btn-secondary rounded-xl border-0">
-          Add to Cart
-        </button>
-        <button className="btn btn-sm btn-outline btn-accent rounded-xl">
-          Details
-        </button>
+       <Link
+            to={`/product-details/${product._id}`}
+            className="btn btn-outline btn-accent rounded-lg w-full"
+          >
+            Details
+          </Link>
       </td>
     </tr>
   );

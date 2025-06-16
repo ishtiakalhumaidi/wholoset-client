@@ -4,16 +4,15 @@ import Banner from "./Banner";
 import Categories from "./Categories";
 import WhyChoose from "./WhyChoose";
 import ProductCard from "../../components/ui/ProductCard";
-import TopProducts from "./TopProducts";
+import TopProducts from "./topSection/TopProducts";
 
 const Home = () => {
   return (
     <div>
       <Banner />
       <Categories />
-      <TopProducts/>
+      <TopProducts />
       <WhyChoose />
-
     </div>
   );
 };

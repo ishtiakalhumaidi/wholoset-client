@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "react-toastify";
+import { AuthContext } from "../contexts/AuthContext";
+import axios from "axios";
 
 const AddProduct = () => {
+  const { user } = useContext(AuthContext);
   const {
     register,
     handleSubmit,
@@ -12,8 +14,28 @@ const AddProduct = () => {
 
   const onSubmit = async (data) => {
     console.log("Product Submitted:", data);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    toast.success("Product added successfully!");
+    if (parseFloat(data.oldPrice) < parseFloat(data.price)) {
+      alert("Old Price Should to be Greater Thn New Price");
+      return;
+    }
+    const newProduct = {
+      ...data,
+      minQuantity: parseFloat(data.minQuantity),
+      mainQuantity: parseFloat(data.mainQuantity),
+      oldPrice: parseFloat(data.oldPrice),
+      price: parseFloat(data.price),
+      rating: parseFloat(data.rating),
+      sellerEmail: user.email,
+    };
+
+    axios
+      .post("http://localhost:3000/add-products", newProduct)
+      .then((result) => {
+        console.log(result.data);
+      })
+      .catch((error) => {
+        console.log(error.code);
+      });
     reset();
   };
 
@@ -135,15 +157,16 @@ const AddProduct = () => {
               defaultValue=""
             >
               <option disabled value="">
-                -- Select --
+                Choose a Category
               </option>
               <option>Electronics & Gadgets</option>
-              <option>Home & Kitchen Appliances</option>
-              <option>Fashion & Apparel</option>
-              <option>Industrial Machinery & Tools</option>
-              <option>Health & Beauty</option>
-              <option>Automotive Parts & Accessories</option>
-              <option>Office Supplies & Stationery</option>
+              <option>Apparel & Fashion</option>
+              <option>Industrial Machinery</option>
+              <option>Home Appliances</option>
+              <option>Office Supplies</option>
+              <option>Health & Personal Care</option>
+              <option>Furniture & Decor</option>
+              <option>Sporting Goods</option>
             </select>
             {errors.category && (
               <span className="text-red-500 text-sm mt-1">
@@ -176,6 +199,23 @@ const AddProduct = () => {
 
         {/* Price & Rating */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <label className="form-control w-full">
+            <span className="label-text font-semibold text-base-content mb-1">
+              Old Price (Per Unit)
+            </span>
+            <input
+              type="number"
+              step="0.01"
+              {...register("oldPrice", { required: "Old Price is required" })}
+              placeholder="e.g. 59.99"
+              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+            />
+            {errors.oldPrice && (
+              <span className="text-red-500 text-sm mt-1">
+                {errors.oldPrice.message}
+              </span>
+            )}
+          </label>
           <label className="form-control w-full">
             <span className="label-text font-semibold text-base-content mb-1">
               Price (Per Unit)
