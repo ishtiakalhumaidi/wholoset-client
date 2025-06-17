@@ -1,15 +1,22 @@
 import React, { useContext, useState } from "react";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import signInLottie from "../../assets/lotties/LogInLottie.json";
 import Lottie from "lottie-react";
 import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
+import { Bounce, toast } from "react-toastify";
 
 const SignIn = () => {
-  const { user, logIn, googleLogIn, isLoading } = useContext(AuthContext);
+  const { logIn, googleLogIn, isLoading } = useContext(AuthContext);
+
   const [error, setError] = useState(null);
+
+  const location = useLocation();
+  console.log(location);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -20,6 +27,18 @@ const SignIn = () => {
     console.log("Form Data:", data);
     logIn(data.email, data.password)
       .then((result) => {
+        toast.success("You have been signin successfully!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        location.state ? navigate(location.state) : navigate("/");
         console.log(result.user);
       })
       .catch((error) => {
@@ -45,6 +64,18 @@ const SignIn = () => {
           .catch((err) => {
             console.error("User didn't add", err);
           });
+        toast.success("You have been signin successfully!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        location.state ? navigate(location.state) : navigate("/");
         console.log(result.user);
       })
       .catch((error) => {

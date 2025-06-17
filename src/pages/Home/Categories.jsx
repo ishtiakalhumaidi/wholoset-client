@@ -12,6 +12,7 @@ import {
 } from "react-icons/md";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { Link } from "react-router";
 
 const Categories = () => {
   useEffect(() => {
@@ -40,9 +41,14 @@ const Categories = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 gap-6 max-w-10/12 mx-auto">
         {categories.map((category, index) => (
-          <div key={index} data-aos="fade-up" data-aos-delay={index * 100}>
+          <Link
+            to={`/category/${(category.name).split(' ').join('-').toLowerCase()}`}
+            key={index}
+            data-aos="fade-up"
+            data-aos-delay={index * 100}
+          >
             <CategoryCard name={category.name} icon={category.icon} />
-          </div>
+          </Link>
         ))}
       </div>
     </div>

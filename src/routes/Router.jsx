@@ -8,11 +8,17 @@ import AddProduct from "../pages/AddProduct";
 import MyProduct from "../pages/MyProduct";
 import CartPage from "../pages/CartPage";
 import ProductDetails from "../pages/ProductDetails";
+import PrivateRoute from "./PrivateRoute";
+import Loader from "../components/common/Loader";
+import Error404 from "../pages/error/Error404";
+import Category from "../pages/Category";
+import MyOrder from "../pages/MyOrder";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: MainLayout,
+    errorElement: <Error404 />,
     children: [
       { index: true, Component: Home },
       {
@@ -24,17 +30,51 @@ export const router = createBrowserRouter([
         Component: SignUp,
       },
       {
+        path: "category/:name",
+        loader: ({ params }) =>
+          fetch(`http://localhost:3000/category/${params.name}`),
+        element: (
+          <PrivateRoute>
+            <Category />
+          </PrivateRoute>
+        ),
+        hydrateFallbackElement: <Loader />,
+      },
+      {
+        path: "my-orders/:name",
+
+        element: (
+          <PrivateRoute>
+            <MyOrder />
+          </PrivateRoute>
+        ),
+        // hydrateFallbackElement: <Loader />,
+      },
+      {
         path: "all-product",
         loader: () => fetch("http://localhost:3000/products"),
-        Component: AllProduct,
+        element: (
+          <PrivateRoute>
+            <AllProduct />
+          </PrivateRoute>
+        ),
+        hydrateFallbackElement: <Loader />,
       },
       {
         path: "add-product",
-        Component: AddProduct,
+        element: (
+          <PrivateRoute>
+            <AddProduct />
+          </PrivateRoute>
+        ),
       },
       {
         path: "my-product",
-        Component: MyProduct,
+        element: (
+          <PrivateRoute>
+            <MyProduct />
+          </PrivateRoute>
+        ),
       },
       {
         path: "my-cart",
@@ -42,7 +82,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "product-details/:id",
-        Component: ProductDetails,
+        element: (
+          <PrivateRoute>
+            <ProductDetails />
+          </PrivateRoute>
+        ),
       },
     ],
   },

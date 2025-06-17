@@ -1,25 +1,74 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { LuArrowUpRight } from "react-icons/lu";
-import { Link, NavLink, useLocation } from "react-router";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 import { Slide } from "react-awesome-reveal";
 import { FiShoppingCart } from "react-icons/fi";
 import { AuthContext } from "../../contexts/AuthContext";
 import { FaRegCircleUser } from "react-icons/fa6";
+import axios from "axios";
+import { Tooltip } from "react-tooltip";
+import Swal from "sweetalert2";
+import getCartProducts from "../../utils/getCartProducts";
 
 const NavBar = () => {
   const location = useLocation();
-  const { user, logOut } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { user, logOut, isLoading } = useContext(AuthContext);
+  const [cartProducts, setCartProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    if (!cartProducts || cartProducts.length === 0) {
+      setTotal(0);
+      return;
+    }
+
+    const newTotal = cartProducts.reduce((sum, element) => {
+      if (!element) return sum;
+      return sum + element.price * element.quantity;
+    }, 0);
+
+    setTotal(newTotal);
+  }, [cartProducts]);
 
   const handleLogOut = () => {
-    logOut()
-      .then(() => {
-        console.log("Sign-out successful.");
-      })
-      .catch((error) => {
-        console.log(error.code);
-      });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to sign out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#34c38f",
+      cancelButtonColor: "#f25c54",
+      confirmButtonText: "Sign Out",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        logOut()
+          .then(() => {
+            Swal.fire({
+              title: "Sign out!",
+              confirmButtonColor: "#34c38f",
+              text: "Sign out successfully",
+              icon: "success",
+            });
+            navigate("/");
+          })
+          .catch((error) => {
+            console.log(error.code);
+          });
+      }
+    });
   };
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const fetchCart = async () => {
+      const data = await getCartProducts(user.email);
+      setCartProducts(data);
+    };
+
+    fetchCart();
+  }, [user]);
 
   const navLinks = (
     <>
@@ -96,7 +145,7 @@ const NavBar = () => {
                   <div className="indicator">
                     <FiShoppingCart className="text-2xl" />
                     <span className="badge badge-sm indicator-item bg-primary text-white border-none">
-                      0
+                      {cartProducts?.length || 0}
                     </span>
                   </div>
                 </div>
@@ -107,24 +156,31 @@ const NavBar = () => {
                   <div className="card-body space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold text-base-content text-lg">
-                        8 Items
+                        {cartProducts?.length || 0} Items
                       </span>
                       <span className="text-sm text-accent">
-                        Subtotal: <strong>$999</strong>
+                        Subtotal: <strong>${total.toFixed(2)}</strong>
                       </span>
                     </div>
                     <ul className="text-sm text-base-content space-y-1">
-                      <li className="flex justify-between">
-                        <span>Sports Shoes</span>
-                        <span>$120</span>
-                      </li>
-                      <li className="flex justify-between">
-                        <span>Backpack</span>
-                        <span>$89</span>
-                      </li>
-                      <li className="text-center text-xs text-gray-400 italic">
-                        +6 more items
-                      </li>
+                      {cartProducts.map((cartProduct) =>
+                        cartProduct ? (
+                          <li
+                            key={cartProduct._id}
+                            className="flex justify-between"
+                          >
+                            <span>{cartProduct.name}</span>
+                            <span>
+                              $
+                              {(
+                                cartProduct.price * cartProduct.quantity
+                              ).toFixed(2)}
+                            </span>
+                          </li>
+                        ) : (
+                          " "
+                        )
+                      )}
                     </ul>
                     <div className="card-actions">
                       <Link
@@ -161,6 +217,8 @@ const NavBar = () => {
                     tabIndex={0}
                     role="button"
                     className="btn btn-ghost btn-circle avatar"
+                    data-tooltip-id="my-tooltip"
+                    data-tooltip-content={`${user.displayName}`}
                   >
                     <div className="w-10 rounded-full">
                       {user?.photoURL ? (
@@ -185,7 +243,7 @@ const NavBar = () => {
                       </a>
                     </li>
                     <li>
-                      <a>Settings</a>
+                      <Link to={`/my-orders/${user.email}`}>My Orders</Link>
                     </li>
                     <li onClick={handleLogOut}>
                       <a>Logout</a>
@@ -193,6 +251,7 @@ const NavBar = () => {
                   </ul>
                 </div>
               )}
+              <Tooltip id="my-tooltip" />
             </div>
           </div>
         </div>

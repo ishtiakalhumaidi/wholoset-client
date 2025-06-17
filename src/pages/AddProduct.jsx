@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router";
 
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
@@ -11,6 +13,7 @@ const AddProduct = () => {
     reset,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate()
 
   const onSubmit = async (data) => {
     console.log("Product Submitted:", data);
@@ -28,15 +31,33 @@ const AddProduct = () => {
       sellerEmail: user.email,
     };
 
-    axios
-      .post("http://localhost:3000/add-products", newProduct)
-      .then((result) => {
-        console.log(result.data);
-      })
-      .catch((error) => {
-        console.log(error.code);
-      });
-    reset();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Please confirm that all the provided information is accurate.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#34c38f",
+      cancelButtonColor: "#f25c54",
+      confirmButtonText: "Yes, submit it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .post("http://localhost:3000/add-products", newProduct)
+          .then((result) => {
+            Swal.fire({
+              title: "Added!",
+              confirmButtonColor: "#34c38f",
+              text: "Your product has been successfully added.",
+              icon: "success",
+            });
+            navigate('/my-product')
+          })
+          .catch((error) => {
+            console.log(error.code);
+          });
+        reset();
+      }
+    });
   };
 
   return (

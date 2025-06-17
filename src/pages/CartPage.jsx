@@ -1,7 +1,14 @@
+import axios from "axios";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaTrashAlt } from "react-icons/fa";
+import { AuthContext } from "../contexts/AuthContext";
+import { Link } from "react-router";
+import getCartProducts from "../utils/getCartProducts";
 
 const CartPage = () => {
+  const { user, isLoading } = useContext(AuthContext);
+  const [subtotal, setSubtotal] = useState(0);
   const {
     register,
     handleSubmit,
@@ -13,12 +20,70 @@ const CartPage = () => {
     // send to backend later
   };
 
-  const quantity = 2;
-  const price = 25;
-  const subtotal = quantity * price;
-  const shipping = 2;
+  // const [userData, setUserData] = useState(null);
+  const [cartProducts, setCartProducts] = useState([]);
+
+  const shipping = 29;
   const tax = 4;
   const total = subtotal + shipping + tax;
+  console.log(cartProducts);
+
+  useEffect(() => {
+    if (!cartProducts || cartProducts.length === 0) {
+      setSubtotal(0);
+      return;
+    }
+
+    const newTotal = cartProducts.reduce((sum, element) => {
+      if (!element) return sum;
+      return sum + element.price * element.quantity;
+    }, 0);
+
+    setSubtotal(newTotal);
+  }, [cartProducts]);
+
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+    if (user) {
+      axios
+        .get(`http://localhost:3000/users?email=${user.email}`)
+        .then((res) => {
+          console.log(res.data);
+          // setUserData(res.data);
+        })
+        .catch((err) => {
+          console.error("an error", err);
+        });
+    }
+  }, [user, isLoading]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const fetchCart = async () => {
+      const data = await getCartProducts(user.email);
+      setCartProducts(data);
+    };
+
+    fetchCart();
+  }, [user]);
+
+  const handleIncreaseDecrease = (data) => {
+    console.log(data)
+    axios
+      .patch(`http://localhost:3000/users/cart?email=${user.email}`, data)
+      .then(() => {
+        return getCartProducts(user.email);
+      })
+      .then((updatedCart) => {
+        setCartProducts(updatedCart);
+      })
+      .catch((err) => {
+        console.error("An error occurred", err);
+      });
+  };
 
   return (
     <div className="grid md:grid-cols-3 gap-6 p-6 bg-base-100">
@@ -26,30 +91,115 @@ const CartPage = () => {
       <div className="md:col-span-2 space-y-4">
         <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
 
-        <div className="bg-base-200 rounded-xl p-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center gap-4">
-            <img
-              src="https://via.placeholder.com/80"
-              alt="Product"
-              className="w-20 h-20 object-contain rounded-lg"
-            />
-            <div>
-              <h3 className="font-semibold text-lg">Wholesale Item</h3>
-              <p className="text-sm font-medium text-primary mt-1">
-                ${price.toFixed(2)}
-              </p>
-            </div>
+        {cartProducts.length == 0 ? (
+          <div className="my-10 flex flex-col justify-center items-center space-y-4 text-center">
+            <p className="text-lg font-medium text-gray-600">
+              Your cart is currently empty.
+            </p>
+            <Link to="/all-product" className="btn btn-accent rounded-xl">
+              Browse products
+            </Link>
           </div>
+        ) : (
+          <div className="space-y-4 max-w-4xl mx-auto my-6">
+            {cartProducts.map((cartProduct) =>
+              cartProduct.name ? (
+                <div
+                  key={cartProduct._id}
+                  className="bg-base-200 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-4">
+                    <img
+                      src={cartProduct.image}
+                      alt={cartProduct.name}
+                      className="w-20 h-20 object-contain rounded-lg border"
+                    />
+                    <div>
+                      <h3 className="font-semibold text-lg">
+                        {cartProduct.name}
+                      </h3>
+                      <p className="text-sm font-medium text-primary mt-1">
+                        ${(cartProduct.price * cartProduct.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
 
-          <div className="flex items-center gap-3">
-            <button className="btn btn-sm btn-outline btn-square rounded-xl">−</button>
-            <span className="text-sm font-medium">{quantity}</span>
-            <button className="btn btn-sm btn-outline btn-square rounded-xl">+</button>
-            <button className="btn btn-sm btn-ghost text-error text-xl rounded-xl">
-              <FaTrashAlt />
-            </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() =>
+                        handleIncreaseDecrease({
+                          productId: cartProduct._id,
+                          action: "remove",
+                        })
+                      }
+                      className="btn btn-sm btn-outline btn-square rounded-xl"
+                    >
+                      −
+                    </button>
+                    <span className="text-sm font-medium">
+                      {cartProduct.quantity}
+                    </span>
+                    <button
+                      onClick={() =>
+                        handleIncreaseDecrease({
+                          productId: cartProduct._id,
+                          action: "add",
+                        })
+                      }
+                      className="btn btn-sm btn-outline btn-square rounded-xl"
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() =>
+                        handleIncreaseDecrease({
+                          productId: cartProduct._id,
+                          action: "delete",
+                        })
+                      }
+                      className="btn btn-sm btn-ghost text-error text-xl rounded-xl"
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  key={cartProduct.productId}
+                  className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 flex items-center justify-between shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-20 h-20 flex items-center justify-center rounded-lg border border-red-200 bg-red-100 text-red-400 font-semibold text-sm">
+                      Deleted
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-lg line-through">
+                        Unknown Product
+                      </h3>
+                      <p className="text-sm font-medium text-red-500 mt-1">
+                        This product is no longer available.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center">
+                    <button
+                      onClick={() =>
+                        handleIncreaseDecrease({
+                          productId: cartProduct.productId,
+                          action: "delete",
+                        })
+                      }
+                      className="btn btn-sm btn-ghost text-error text-xl rounded-xl"
+                    >
+                      <FaTrashAlt />
+                    </button>
+                  </div>
+                </div>
+              )
+            )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Right: Checkout */}
@@ -80,7 +230,9 @@ const CartPage = () => {
 
           {/* Full Name */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">Full Name</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Full Name
+            </span>
             <input
               {...register("fullName", { required: "Full name is required" })}
               type="text"
@@ -88,7 +240,9 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.fullName && (
-              <span className="text-red-500 text-sm">{errors.fullName.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.fullName.message}
+              </span>
             )}
           </label>
 
@@ -108,13 +262,17 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.email && (
-              <span className="text-red-500 text-sm">{errors.email.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.email.message}
+              </span>
             )}
           </label>
 
           {/* Phone Number */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">Phone Number</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Phone Number
+            </span>
             <div className="flex gap-2">
               <select
                 {...register("countryCode")}
@@ -141,7 +299,9 @@ const CartPage = () => {
               />
             </div>
             {errors.phone && (
-              <span className="text-red-500 text-sm">{errors.phone.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.phone.message}
+              </span>
             )}
           </label>
 
@@ -162,7 +322,9 @@ const CartPage = () => {
 
           {/* Address */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">Full Address</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Full Address
+            </span>
             <input
               {...register("address", { required: "Address is required" })}
               type="text"
@@ -170,13 +332,17 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.address && (
-              <span className="text-red-500 text-sm">{errors.address.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.address.message}
+              </span>
             )}
           </label>
 
           {/* Payment */}
           <div className="form-control flex items-start gap-3">
-            <span className="label-text font-medium text-sm mb-1">Payment Method</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Payment Method
+            </span>
             <label className="label cursor-pointer gap-2">
               <input
                 {...register("paymentMethod", { required: true })}
@@ -190,7 +356,10 @@ const CartPage = () => {
           </div>
 
           {/* Buttons */}
-          <button type="submit" className="btn btn-primary w-full rounded-xl mt-3">
+          <button
+            type="submit"
+            className="btn btn-primary w-full rounded-xl mt-3"
+          >
             Checkout
           </button>
           <button type="button" className="btn btn-outline w-full rounded-xl">

@@ -6,6 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
+import { Bounce, toast } from "react-toastify";
 
 const SignUp = () => {
   const { googleLogIn, isLoading, createUser, updateUserData } =
@@ -18,36 +19,57 @@ const SignUp = () => {
     formState: { errors },
   } = useForm();
 
- const onSubmit = (data) => {
-  const { email, password, fullName, photoURL } = data;
+  const onSubmit = (data) => {
+    const { email, password, fullName, photoURL } = data;
 
-  createUser(email, password)
-    .then(() => {
-      return updateUserData(fullName, photoURL);
-    })
-    .then(() => {
-      const userData = {
-        displayName: fullName,
-        email,
-        photoURL,
-      };
-      return axios.post("http://localhost:3000/users", userData);
-    })
-    .then((res) => {
-      console.log("User saved:", res.data);
-      navigate("/");
-    })
-    .catch((error) => {
-      console.error("Error:", error.code || error.message);
-    });
-};
-
+    createUser(email, password)
+      .then(() => {
+        return updateUserData(fullName, photoURL);
+      })
+      .then(() => {
+        const userData = {
+          displayName: fullName,
+          email,
+          photoURL,
+        };
+        toast.success("Your account has been created successfully!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
+        return axios.post("http://localhost:3000/users", userData);
+      })
+      .then((res) => {
+        console.log("User saved:", res.data);
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Error:", error.code || error.message);
+      });
+  };
 
   // googleSignUp
   const googleSignUp = () => {
     setError(null);
     googleLogIn()
       .then((result) => {
+        toast.success("Your account has been created successfully!", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          transition: Bounce,
+        });
         const data = {
           displayName: result.user.displayName,
           email: result.user.email,
@@ -62,7 +84,7 @@ const SignUp = () => {
           .catch((err) => {
             console.error("User didn't add", err);
           });
-
+        navigate("/");
         console.log(result.user);
       })
       .catch((error) => {

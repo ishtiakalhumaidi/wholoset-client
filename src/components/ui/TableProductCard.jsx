@@ -39,7 +39,7 @@ const TableProductCard = ({ product }) => {
         <p className="text-sm">
           <span className="font-medium">Min Qty:</span> {minQuantity} pairs
         </p>
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-xs text-gray-500">{description.split(" ").slice(0, 9).join(" ")}...</p>
       </td>
 
       {/* Pricing */}

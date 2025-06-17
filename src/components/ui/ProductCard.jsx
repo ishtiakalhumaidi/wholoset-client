@@ -16,19 +16,16 @@ const ProductCard = ({ product }) => {
     discount,
   } = product;
 
-
-
-  
   return (
-    <div className="max-w-sm rounded-xl overflow-hidden shadow-lg bg-base-100 border border-base-300 hover:scale-103 duration-700 my-2">
-      <figure className=" p-4 pb-0">
+    <div className="max-w-sm rounded-xl overflow-hidden shadow-lg bg-base-100 border border-base-300 hover:scale-103 duration-700 my-2 flex flex-col justify-between p-4">
+      <figure>
         <img
           src={image}
           alt="Product Image"
           className="w-full object-cover h-48 rounded-lg"
         />
       </figure>
-      <div className="p-5 space-y-2">
+      <div className="mt-4 space-y-2 flex-1/2 ">
         <h2 className="text-xl font-bold text-base-content">{name}</h2>
         <p className="text-sm text-base-content">
           <span className="font-medium">Brand:</span> {brand}
@@ -39,7 +36,11 @@ const ProductCard = ({ product }) => {
         <p className="text-sm text-base-content">
           <span className="font-medium">Min Qty:</span> {minQuantity} pairs
         </p>
-        <p className="text-sm text-base-content mt-1">{description}</p>
+
+        <p className="text-sm text-base-content mt-1 flex-1">
+          {description.split(" ").slice(0, 9).join(" ")}...
+        </p>
+
         <div className="mt-2">
           <p className="text-lg font-semibold text-accent">
             ${price.toFixed(2)} / pair
@@ -54,6 +55,7 @@ const ProductCard = ({ product }) => {
             </span>
           </div>
         </div>
+
         <div className="flex items-center gap-1 mt-2">
           <div className="rating rating-sm">
             {[...Array(5)].map((_, index) => (
@@ -74,15 +76,14 @@ const ProductCard = ({ product }) => {
             {rating} (15k reviews)
           </span>
         </div>
-        <div className="mt-4 flex gap-2">
-          <Link
-            to={`/product-details/${product._id}`}
-            className="btn btn-outline btn-accent rounded-lg w-full"
-          >
-            Details
-          </Link>
-        </div>
+        <div className="mt-4 flex gap-2"></div>
       </div>
+      <Link
+        to={`/product-details/${product._id}`}
+        className="btn btn-outline btn-accent rounded-lg w-full"
+      >
+        Show Details
+      </Link>
     </div>
   );
 };

@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
+import Swal from "sweetalert2";
+import { Link } from "react-router";
 
 const MyProduct = () => {
   const [editingProduct, setEditingProduct] = useState(null);
@@ -31,38 +33,74 @@ const MyProduct = () => {
       rating: parseFloat(data.rating),
       sellerEmail: user.email,
     };
-
-    axios
-      .put(
-        `http://localhost:3000/update-product/${editingProduct._id}`,
-        updatedProduct
-      )
-      .then((result) => {
-        console.log(result.data);
-        document.getElementById("my_modal_3").close();
-        const newList = products.map((product) =>
-          product._id === editingProduct._id ? updatedProduct : product
-        );
-        setProducts(newList);
-      })
-      .catch((error) => {
-        console.log("Update failed", error);
-      });
-    reset();
+    document.getElementById("my_modal_3").close();
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to update your product data!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#34c38f",
+      cancelButtonColor: "#f25c54",
+      confirmButtonText: "Yes, update it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .put(
+            `http://localhost:3000/update-product/${editingProduct._id}`,
+            updatedProduct
+          )
+          .then((result) => {
+            if (result.data.modifiedCount) {
+              const newList = products.map((product) =>
+                product._id === editingProduct._id ? updatedProduct : product
+              );
+              setProducts(newList);
+              Swal.fire({
+                title: "Updated!",
+                confirmButtonColor: "#34c38f",
+                text: "Your product has been updated successfully.",
+                icon: "success",
+              });
+            }
+          })
+          .catch((error) => {
+            console.log("Update failed", error);
+          });
+        reset();
+      }
+    });
   };
 
   const handleDelete = (id) => {
-    axios
-      .delete(`http://localhost:3000/delete-product/${id}`)
-      .then((res) => {
-        console.log(res.data);
-        if (res.data.deletedCount) {
-          setProducts(products.filter((product) => product._id != id));
-        }
-      })
-      .catch((error) => {
-        console.error("delete error", error);
-      });
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#34c38f",
+      cancelButtonColor: "#f25c54",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`http://localhost:3000/delete-product/${id}`)
+          .then((res) => {
+            console.log(res.data);
+            if (res.data.deletedCount) {
+              setProducts(products.filter((product) => product._id != id));
+            }
+          })
+          .catch((error) => {
+            console.error("delete error", error);
+          });
+        Swal.fire({
+          title: "Deleted!",
+          confirmButtonColor: "#34c38f",
+          text: "Your product has been deleted.",
+          icon: "success",
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -84,7 +122,13 @@ const MyProduct = () => {
         Your Product:
       </h2>
       <div className="bg-base-100 shadow-xl rounded-2xl overflow-x-auto">
-        <table className="min-w-full divide-y divide-base-300">
+       {products.length==0?<div className="my-10 flex flex-col justify-center items-center space-y-4 text-center">
+  <p className="text-lg font-medium text-gray-600">Oops! You haven’t added any products yet.</p>
+  <Link to="/add-product" className="btn btn-accent rounded-xl">
+    Add your first product
+  </Link>
+</div>
+: <table className="min-w-full divide-y divide-base-300">
           {/* Table Head */}
           <thead className="bg-base-200">
             <tr>
@@ -152,7 +196,7 @@ const MyProduct = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+        </table>}
       </div>
 
       {/*! modal for update */}

@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
+import Swal from "sweetalert2";
+import { useForm } from "react-hook-form";
 
 const ProductDetails = () => {
   const { user } = useContext(AuthContext);
@@ -32,17 +34,73 @@ const ProductDetails = () => {
     (product.minQuantity || 0) + 20,
   ];
 
+  // react-hook-form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      fullName: "",
+      email: user?.email || "",
+      countryCode: "+1",
+      phone: "",
+      country: "Bangladesh",
+      address: "",
+      paymentMethod: "Cash on Delivery",
+    },
+  });
+
+  const onSubmit = (data) => {
+    if (isInvalid) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid quantity",
+        text: `Please select quantity between ${product.minQuantity} and ${product.mainQuantity}`,
+      });
+      return;
+    }
+
+    // You can handle the buy now logic here with form data & quantity
+    console.log("Purchase data:", { ...data, quantity });
+
+    Swal.fire({
+      position: "center",
+      icon: "success",
+      title: "Purchase confirmed!",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+
+    // Close modal after purchase
+    document.getElementById("my_modal_3").close();
+  };
+
+  const increaseQty = () => {
+    if (quantity < product.mainQuantity) setQuantity(quantity + 1);
+  };
+  const decreaseQty = () => {
+    if (quantity > product.minQuantity) setQuantity(quantity - 1);
+  };
+
   const handleAddCart = () => {
     const data = { productId: id, quantity, action: "add" };
     axios
       .patch(`http://localhost:3000/users/cart?email=${user.email}`, data)
       .then((res) => {
         console.log(res.data);
-        
+
         return axios.get(`http://localhost:3000/products/${id}`);
       })
       .then((res) => {
         setProduct(res.data);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Product has been added to your cart.",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       })
       .catch((err) => {
         console.error("An error occurred", err);
@@ -142,9 +200,7 @@ const ProductDetails = () => {
             </button>
             <button
               className="btn btn-primary rounded-xl font-primary"
-              onClick={() =>
-                console.log("Buying now:", { ...product, quantity })
-              }
+              onClick={() => document.getElementById("my_modal_3").showModal()}
               disabled={isInvalid}
             >
               Buy Now
@@ -152,6 +208,182 @@ const ProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <dialog id="my_modal_3" className="modal">
+        <div className="modal-box relative">
+          {/* Close button outside form */}
+          <button
+            type="button"
+            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            onClick={() => document.getElementById("my_modal_3").close()}
+          >
+            ✕
+          </button>
+
+          <h3 className="font-bold text-lg mb-4">Complete Your Purchase</h3>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Full Name */}
+            <label className="form-control w-full">
+              <span className="label-text font-medium text-sm mb-1">
+                Full Name
+              </span>
+              <input
+                value={user.displayName}
+                readOnly
+                {...register("fullName", { required: "Full name is required" })}
+                type="text"
+                className="input input-bordered rounded-xl w-full focus:outline-secondary"
+              />
+              {errors.fullName && (
+                <span className="text-red-500 text-sm">
+                  {errors.fullName.message}
+                </span>
+              )}
+            </label>
+
+            {/* Email */}
+            <label className="form-control w-full">
+              <span className="label-text font-medium text-sm mb-1">Email</span>
+              <input
+                value={user.email}
+                readOnly
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^\S+@\S+\.\S+$/,
+                    message: "Invalid email",
+                  },
+                })}
+                type="email"
+                className="input input-bordered rounded-xl w-full focus:outline-secondary"
+              />
+              {errors.email && (
+                <span className="text-red-500 text-sm">
+                  {errors.email.message}
+                </span>
+              )}
+            </label>
+
+            {/* Phone Number */}
+            <label className="form-control w-full">
+              <span className="label-text font-medium text-sm mb-1">
+                Phone Number
+              </span>
+              <div className="flex gap-2">
+                <select
+                  {...register("countryCode")}
+                  className="select select-bordered rounded-xl max-w-[120px] focus:outline-secondary"
+                >
+                  <option value="+1">+1</option>
+                  <option value="+880">+880</option>
+                  <option value="+44">+44</option>
+                  <option value="+91">+91</option>
+                </select>
+                <input
+                  {...register("phone", {
+                    required: "Phone number is required",
+                    minLength: { value: 7, message: "Too short" },
+                  })}
+                  type="tel"
+                  placeholder="123456789"
+                  className="input input-bordered w-full rounded-xl focus:outline-secondary"
+                />
+              </div>
+              {errors.phone && (
+                <span className="text-red-500 text-sm">
+                  {errors.phone.message}
+                </span>
+              )}
+            </label>
+
+            {/* Country */}
+            <label className="form-control w-full">
+              <span className="label-text font-medium text-sm mb-1">
+                Country
+              </span>
+              <select
+                {...register("country", { required: true })}
+                className="select select-bordered rounded-xl w-full focus:outline-secondary"
+              >
+                <option value="Bangladesh">Bangladesh</option>
+                <option value="USA">United States</option>
+                <option value="UK">United Kingdom</option>
+                <option value="India">India</option>
+              </select>
+            </label>
+
+            {/* Address */}
+            <label className="form-control w-full">
+              <span className="label-text font-medium text-sm mb-1">
+                Address
+              </span>
+              <input
+                {...register("address", { required: "Address is required" })}
+                type="text"
+                placeholder="Street, City, Postal Code"
+                className="input input-bordered rounded-xl w-full focus:outline-secondary"
+              />
+              {errors.address && (
+                <span className="text-red-500 text-sm">
+                  {errors.address.message}
+                </span>
+              )}
+            </label>
+
+            {/* Quantity selector */}
+            <div className="flex items-center justify-between mt-2">
+              <span className="font-medium text-sm">Quantity</span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={decreaseQty}
+                  className="btn btn-sm rounded-xl bg-base-200 hover:bg-base-300"
+                  disabled={quantity <= product.minQuantity}
+                >
+                  −
+                </button>
+                <span className="font-medium">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={increaseQty}
+                  className="btn btn-sm rounded-xl bg-base-200 hover:bg-base-300"
+                  disabled={quantity >= product.mainQuantity}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Payment Method */}
+            <div className="form-control mt-3">
+              <span className="label-text font-medium text-sm mb-1">
+                Payment Method
+              </span>
+              <label className="label cursor-pointer gap-2">
+                <input
+                  {...register("paymentMethod", { required: true })}
+                  type="radio"
+                  value="Cash on Delivery"
+                  className="radio radio-sm"
+                  defaultChecked
+                />
+                <span className="label-text">Cash on Delivery</span>
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary w-full rounded-xl mt-4"
+              
+              disabled={isInvalid}
+            >
+              Confirm Purchase
+            </button>
+          </form>
+        </div>
+      </dialog>
     </div>
   );
 };
