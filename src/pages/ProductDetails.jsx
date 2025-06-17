@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 import Swal from "sweetalert2";
 import { useForm } from "react-hook-form";
@@ -9,6 +9,7 @@ const ProductDetails = () => {
   const { user } = useContext(AuthContext);
   const [product, setProduct] = useState({});
   const [quantity, setQuantity] = useState(0);
+  const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -41,7 +42,7 @@ const ProductDetails = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fullName: "",
+      fullName: user?.displayName,
       email: user?.email || "",
       countryCode: "+1",
       phone: "",
@@ -61,18 +62,36 @@ const ProductDetails = () => {
       return;
     }
 
-    // You can handle the buy now logic here with form data & quantity
-    console.log("Purchase data:", { ...data, quantity });
+    const purchaseData = {
+      productId: id,
+      sellerEmail: product.sellerEmail,
+      ...data,
+      quantity,
+    };
+    axios
+      .patch(
+        `http://localhost:3000/users/buy?email=${user.email}`,
+        purchaseData
+      )
+      .then((res) => {
+        console.log(res.data);
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Purchase confirmed!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        navigate(`/my-orders/${user.email}`);
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid quantity",
+          text: `${err.message}`,
+        });
+      });
 
-    Swal.fire({
-      position: "center",
-      icon: "success",
-      title: "Purchase confirmed!",
-      showConfirmButton: false,
-      timer: 1500,
-    });
-
-    // Close modal after purchase
     document.getElementById("my_modal_3").close();
   };
 
@@ -230,8 +249,7 @@ const ProductDetails = () => {
                 Full Name
               </span>
               <input
-                value={user.displayName}
-                readOnly
+                disabled
                 {...register("fullName", { required: "Full name is required" })}
                 type="text"
                 className="input input-bordered rounded-xl w-full focus:outline-secondary"
@@ -247,8 +265,7 @@ const ProductDetails = () => {
             <label className="form-control w-full">
               <span className="label-text font-medium text-sm mb-1">Email</span>
               <input
-                value={user.email}
-                readOnly
+                disabled
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -376,7 +393,6 @@ const ProductDetails = () => {
             <button
               type="submit"
               className="btn btn-primary w-full rounded-xl mt-4"
-              
               disabled={isInvalid}
             >
               Confirm Purchase
