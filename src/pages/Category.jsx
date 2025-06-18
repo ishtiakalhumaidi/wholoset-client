@@ -15,6 +15,7 @@ const Category = () => {
 
   return (
     <div className="w-10/12 mx-auto">
+      <title>Category | Wholoset</title>
       <div className="flex justify-between my-10">
         <div>
           <h2 className="text-3xl text-primary font-accent">{category}</h2>

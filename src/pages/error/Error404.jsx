@@ -6,6 +6,7 @@ import { Link } from "react-router";
 const Error404 = () => {
   return (
     <div className="flex flex-col-reverse text-center md:text-left md:flex-row w-screen h-screen overflow-hidden justify-center items-center max-w-10/12 mx-auto">
+      <title>Error404 | Wholoset</title>
       <div>
         <h2 className="text-4xl md:text-6xl font-bold text-[#f25c54]">
           404 error...

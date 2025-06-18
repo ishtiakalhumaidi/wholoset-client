@@ -30,6 +30,7 @@ const MyOrder = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-base-200 rounded-xl shadow-lg mt-10">
+      <title>My Order | Wholoset</title>
       <h2 className="text-3xl font-bold text-center mb-6">My Orders</h2>
       {orders.length === 0 ? (
         <p className="text-center text-gray-500">You have no orders yet.</p>

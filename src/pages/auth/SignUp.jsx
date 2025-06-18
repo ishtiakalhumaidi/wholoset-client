@@ -96,6 +96,7 @@ const SignUp = () => {
 
   return (
     <div className="my-10 md:my-26 flex flex-col lg:flex-row bg-base-100">
+      <title>Sign Up | Wholoset</title>
       {/* Lottie Animation */}
       <div className="lg:w-1/2 w-full hidden md:flex items-center justify-center p-10">
         <div className="text-center">

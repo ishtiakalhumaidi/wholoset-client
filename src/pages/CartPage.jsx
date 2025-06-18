@@ -70,6 +70,7 @@ const CartPage = () => {
 
   return (
     <div className="grid md:grid-cols-3 gap-6 p-6 bg-base-100">
+      <title>Your Cart | Wholoset</title>
       {/* Left: Cart Items */}
       <div className="md:col-span-2 space-y-4">
         <h2 className="text-2xl font-bold mb-4">Your Cart</h2>

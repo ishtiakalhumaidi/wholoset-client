@@ -14,6 +14,8 @@ import Error404 from "../pages/error/Error404";
 import Category from "../pages/Category";
 import MyOrder from "../pages/MyOrder";
 import UserProfile from "../pages/UserProfile";
+import Terms from "../pages/Terms";
+import Privacy from "../pages/Privacy";
 
 export const router = createBrowserRouter([
   {
@@ -100,6 +102,14 @@ export const router = createBrowserRouter([
             <ProductDetails />
           </PrivateRoute>
         ),
+      },
+      {
+        path: "terms",
+        Component: Terms,
+      },
+      {
+        path: "policy",
+        Component: Privacy,
       },
     ],
   },

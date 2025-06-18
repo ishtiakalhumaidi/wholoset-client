@@ -118,6 +118,7 @@ const MyProduct = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <title>My Products | Wholoset</title>
       <h2 className="text-2xl font-primary font-semibold text-primary mb-4">
         Your Product:
       </h2>

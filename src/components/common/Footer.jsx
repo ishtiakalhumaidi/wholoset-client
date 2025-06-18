@@ -3,6 +3,7 @@ import { Slide } from "react-awesome-reveal";
 import { BsInstagram } from "react-icons/bs";
 import { FaFacebook } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { Link } from "react-router";
 
 const Footer = () => {
   return (
@@ -51,68 +52,68 @@ const Footer = () => {
                 </p>
                 <ul className="mt-2 space-y-2">
                   <li>
-                    <a
-                      href="/category/electronics-gadgets"
+                    <Link
+                      to="/category/electronics-&-gadgets"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Electronics & Gadgets
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/apparel-fashion"
+                    <Link
+                      to="/category/apparel-&-fashion"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Apparel & Fashion
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/industrial-machinery"
+                    <Link
+                      to="/category/industrial-machinery"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Industrial Machinery
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/home-appliances"
+                    <Link
+                      to="/category/home-appliances"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Home Appliances
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/office-supplies"
+                    <Link
+                      to="/category/office-supplies"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Office Supplies
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/health-personal-care"
+                    <Link
+                      to="/category/health-&-personal-care"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Health & Personal Care
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/furniture-decor"
+                    <Link
+                      to="/category/furniture-&-decor"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Furniture & Decor
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/category/sporting-goods"
+                    <Link
+                      to="/category/sporting-goods"
                       className="transition-colors duration-300 text-gray-200 hover:text-gray-100"
                     >
                       Sporting Goods
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -123,28 +124,28 @@ const Footer = () => {
                 </p>
                 <ul className="mt-2 space-y-2">
                   <li>
-                    <a
-                      href="/"
+                    <Link
+                      to={"/"}
                       className="text-gray-200 hover:text-teal-accent-400"
                     >
                       Home
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a
-                      href="/categories"
+                      href="#categories"
                       className="text-gray-200 hover:text-teal-accent-400"
                     >
                       Categories
                     </a>
                   </li>
                   <li>
-                    <a
-                      href="/products"
+                    <Link
+                      to={"/all-product"}
                       className="text-gray-200 hover:text-teal-accent-400"
                     >
                       All Product
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -155,20 +156,20 @@ const Footer = () => {
                 </p>
                 <ul className="mt-2 space-y-2">
                   <li>
-                    <a
-                      href="/terms"
+                    <Link
+                      to="/terms"
                       className="text-gray-200 hover:text-teal-accent-400"
                     >
                       Terms & Conditions
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
-                      href="/policy"
+                    <Link
+                      to="/policy"
                       className="text-gray-200 hover:text-teal-accent-400"
                     >
                       Privacy Policy
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>

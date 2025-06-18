@@ -9,6 +9,7 @@ import TopProducts from "./topSection/TopProducts";
 const Home = () => {
   return (
     <div>
+      <title>Home | Wholoset</title>
       <Banner />
       <Categories />
       <TopProducts />

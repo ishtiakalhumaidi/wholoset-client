@@ -1,12 +1,97 @@
-# React + Vite
+# Wholoset – B2B Wholesale Marketplace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🌐 **Live Site**: [https://wholoset.web.app/](https://wholoset.web.app/)
 
-Currently, two official plugins are available:
+Wholoset is a full-stack global **B2B wholesale platform** that connects manufacturers and distributors with retailers and institutional buyers. This platform allows brandized users to upload wholesale products and buyers to browse, purchase, and manage their orders seamlessly.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🚀 Key Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### ✅ General Features
+- 🔐 Secure authentication with Firebase (Email/Password + Google login)
+- 🛡️ JWT-based private route protection
+- 🌐 Responsive design (mobile, tablet, desktop)
+- 🎨 Elegant and professional UI using Tailwind CSS + DaisyUI
+- 🌗 Light/Dark mode toggle
+- 🧭 Dynamic Page Titles
+- 🚫 404 Not Found Page
+- 🔄 Auto Spinner while loading
+
+---
+
+### 🧑‍💼 Authentication
+- User registration with validation
+- Login with Email/Password or Google
+- Toast/sweet alerts for login/register feedback
+- Firebase keys and MongoDB credentials secured via `.env`
+
+---
+
+### 🛍️ Product Features
+- ➕ Add Product (Brandized Users only)
+- 📃 View All Products (Private Route)
+- ✏️ Update Product Info (Accessible to any logged-in user)
+- 🔍 Category-wise Product Filtering
+- 🔃 Toggle View: Card/Table display
+- ⚙️ Product Rating with `react-rating-stars-component`
+- 🏷️ Minimum Selling Quantity enforcement on Buy modal
+- 💵 Real-time quantity updates using MongoDB `$inc` operator
+
+---
+
+### 🛒 Cart Features
+- 🧾 View Purchased Products (Private Route)
+- ❌ Remove from cart with quantity increment logic
+- 📅 Shows buy date, product info, and order quantity
+
+---
+
+
+### 🔐 Route Structure
+
+| Route | Access | Description |
+|-------|--------|-------------|
+| `/` | Public | Home Page with banner, categories, and extra sections |
+| `/login` | Public | Login with Firebase |
+| `/register` | Public | User Registration |
+| `/all-products` | Private | All Product listing with filter + toggle |
+| `/add-product` | Private (Brandized) | Add Product form |
+| `/my-product` | Private | User's Added Products |
+| `/cart` | Private | Purchased Product List |
+| `/product/:id` | Private | Product Details + Buy Modal |
+| `*` | Public | 404 Not Found Page |
+
+---
+
+## 🧩 Packages Used
+
+### 🧑 Core Packages
+- `react`
+- `react-router`
+- `firebase`
+- `axios`
+- `mongodb`
+- `express`
+- `cors`
+- `jsonwebtoken`
+
+###  UI & UX
+- `tailwindcss`
+- `daisyui`
+- `react-icons`
+- `aos` (scroll animation)
+- `swiper` (slider)
+- `sweetalert2`
+- `react-toastify`
+- `react-spinners`
+- `lottie-react`
+- `react-rating-stars-component`
+- `react-awesome-reveal`
+- `@emotion/react`
+
+### 🧠 Forms & Utils
+- `react-hook-form`
+- `react-tooltip`
+
+

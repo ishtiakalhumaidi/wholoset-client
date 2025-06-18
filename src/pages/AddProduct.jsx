@@ -62,6 +62,7 @@ const AddProduct = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-8 my-10 bg-white dark:bg-base-200 rounded-2xl shadow-xl">
+      <title>Add Product | Wholoset</title>
       <h2 className="text-4xl font-bold text-center text-primary mb-10 font-secondary">
         Submit New Product
       </h2>

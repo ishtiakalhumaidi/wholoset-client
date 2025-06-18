@@ -86,6 +86,7 @@ const SignIn = () => {
 
   return (
     <div className="flex flex-col items-center lg:flex-row-reverse bg-base-100 my-10 md:my-26">
+      <title>Sign In | Wholoset</title>
       <div className="lg:w-1/2 w-full md:flex items-center justify-center p-10 hidden">
         <div className="text-center">
           <Lottie

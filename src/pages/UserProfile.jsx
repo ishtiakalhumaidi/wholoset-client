@@ -1,14 +1,12 @@
 import { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { useForm } from "react-hook-form";
 
 const UserProfile = () => {
   const { user } = useContext(AuthContext);
 
-
-
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
+      <title>My Profile | Wholoset</title>
       <div className="bg-base-200 p-6 rounded-xl shadow-sm space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-center gap-4">
@@ -25,7 +23,6 @@ const UserProfile = () => {
             <p className="text-sm text-gray-500">{user?.email}</p>
           </div>
         </div>
-
       </div>
     </div>
   );
