@@ -6,14 +6,14 @@ import { Slide } from "react-awesome-reveal";
 import { FiShoppingCart } from "react-icons/fi";
 import { AuthContext } from "../../contexts/AuthContext";
 import { FaRegCircleUser } from "react-icons/fa6";
-import axios from "axios";
 import { Tooltip } from "react-tooltip";
 import Swal from "sweetalert2";
-import getCartProducts from "../../utils/getCartProducts";
+import useCartProductsApi from "../../api/useCartProductsApi";
 
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { getCartProducts } = useCartProductsApi();
   const { user, logOut, isLoading } = useContext(AuthContext);
   const [cartProducts, setCartProducts] = useState([]);
   const [total, setTotal] = useState(0);
@@ -59,16 +59,18 @@ const NavBar = () => {
       }
     });
   };
+
   useEffect(() => {
-    if (!user?.email) return;
+    if (!user?.email || isLoading) return;
 
-    const fetchCart = async () => {
-      const data = await getCartProducts(user.email);
-      setCartProducts(data);
-    };
-
-    fetchCart();
-  }, [user]);
+    getCartProducts(user.email)
+      .then((data) => {
+        setCartProducts(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching cart products:", error);
+      });
+  }, [user, getCartProducts, isLoading]);
 
   const navLinks = (
     <>
@@ -81,9 +83,11 @@ const NavBar = () => {
       <li>
         <NavLink to={"/add-Product"}>Add Product</NavLink>
       </li>
-      <li>
-        <NavLink to={"/My-product"}>My product</NavLink>
-      </li>
+      {user && (
+        <li>
+          <NavLink to={"/My-product"}>My product</NavLink>
+        </li>
+      )}
     </>
   );
 
@@ -163,23 +167,25 @@ const NavBar = () => {
                       </span>
                     </div>
                     <ul className="text-sm text-base-content space-y-1">
-                      {cartProducts.map((cartProduct) =>
-                        cartProduct ? (
-                          <li
-                            key={cartProduct._id}
-                            className="flex justify-between"
-                          >
-                            <span>{cartProduct.name}</span>
-                            <span>
-                              $
-                              {(
-                                cartProduct.price * cartProduct.quantity
-                              ).toFixed(2)}
-                            </span>
-                          </li>
-                        ) : (
-                          " "
+                      {cartProducts?.length > 0 ? (
+                        cartProducts.map((cartProduct) =>
+                          cartProduct ? (
+                            <li
+                              key={cartProduct._id}
+                              className="flex justify-between"
+                            >
+                              <span>{cartProduct.name}</span>
+                              <span>
+                                $
+                                {(
+                                  cartProduct.price * cartProduct.quantity
+                                ).toFixed(2)}
+                              </span>
+                            </li>
+                          ) : null
                         )
+                      ) : (
+                        <li>No items in cart</li>
                       )}
                     </ul>
                     <div className="card-actions">
@@ -237,10 +243,10 @@ const NavBar = () => {
                     className="menu menu-sm dropdown-content bg-base-100 rounded-box mt-3 w-52 p-2 shadow z-[100]"
                   >
                     <li>
-                      <a className="justify-between">
+                      <Link to={"/my-profile"} className="justify-between">
                         Profile
                         <span className="badge">New</span>
-                      </a>
+                      </Link>
                     </li>
                     <li>
                       <Link to={`/my-orders/${user.email}`}>My Orders</Link>

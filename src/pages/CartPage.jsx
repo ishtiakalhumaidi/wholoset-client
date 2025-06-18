@@ -4,10 +4,11 @@ import { useForm } from "react-hook-form";
 import { FaTrashAlt } from "react-icons/fa";
 import { AuthContext } from "../contexts/AuthContext";
 import { Link } from "react-router";
-import getCartProducts from "../utils/getCartProducts";
+import useCartProductsApi from "../api/useCartProductsApi";
 
 const CartPage = () => {
-  const { user, isLoading } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+  const { getCartProducts } = useCartProductsApi();
   const [subtotal, setSubtotal] = useState(0);
   const {
     register,
@@ -20,7 +21,6 @@ const CartPage = () => {
     // send to backend later
   };
 
-  // const [userData, setUserData] = useState(null);
   const [cartProducts, setCartProducts] = useState([]);
 
   const shipping = 29;
@@ -43,23 +43,6 @@ const CartPage = () => {
   }, [cartProducts]);
 
   useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-    if (user) {
-      axios
-        .get(`http://localhost:3000/users?email=${user.email}`)
-        .then((res) => {
-          console.log(res.data);
-          // setUserData(res.data);
-        })
-        .catch((err) => {
-          console.error("an error", err);
-        });
-    }
-  }, [user, isLoading]);
-
-  useEffect(() => {
     if (!user?.email) return;
 
     const fetchCart = async () => {
@@ -71,7 +54,7 @@ const CartPage = () => {
   }, [user]);
 
   const handleIncreaseDecrease = (data) => {
-    console.log(data)
+    console.log(data);
     axios
       .patch(`http://localhost:3000/users/cart?email=${user.email}`, data)
       .then(() => {

@@ -4,10 +4,12 @@ import { AuthContext } from "../contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { Link } from "react-router";
+import useMyProducts from "../api/useMyProductsApi";
 
 const MyProduct = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const { user } = useContext(AuthContext);
+  const { getMyProducts } = useMyProducts();
   const [products, setProducts] = useState([]);
   const {
     register,
@@ -105,16 +107,14 @@ const MyProduct = () => {
 
   useEffect(() => {
     if (!user || !user.email) return;
-    axios
-      .get(`http://localhost:3000/my-product?email=${user.email}`)
-      .then((res) => {
-        console.log(res.data);
-        setProducts(res.data);
+    getMyProducts(user.email)
+      .then((data) => {
+        setProducts(data);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
       });
-  }, [user?.email]);
+  }, [user, getMyProducts]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -122,81 +122,86 @@ const MyProduct = () => {
         Your Product:
       </h2>
       <div className="bg-base-100 shadow-xl rounded-2xl overflow-x-auto">
-       {products.length==0?<div className="my-10 flex flex-col justify-center items-center space-y-4 text-center">
-  <p className="text-lg font-medium text-gray-600">Oops! You haven’t added any products yet.</p>
-  <Link to="/add-product" className="btn btn-accent rounded-xl">
-    Add your first product
-  </Link>
-</div>
-: <table className="min-w-full divide-y divide-base-300">
-          {/* Table Head */}
-          <thead className="bg-base-200">
-            <tr>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
-                Image
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
-                Name
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
-                Price
-              </th>
-              <th className="px-6 py-4 text-center text-sm font-semibold text-base-content uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          {/* Table Body */}
-          <tbody className="bg-base-100 divide-y divide-base-300">
-            {products.map((product) => (
-              <tr
-                key={product._id}
-                className="hover:bg-base-200 transition duration-200"
-              >
-                <td className="px-6 py-4">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-lg border border-base-300 shadow-sm"
-                  />
-                </td>
-                <td className="px-6 py-4 text-base-content font-medium">
-                  {product.name}
-                </td>
-                <td className="px-6 py-4 text-base-content font-medium">
-                  {product.category}
-                </td>
-                <td className="px-6 py-4 text-accent font-semibold">
-                  ${product.price.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <div className="flex gap-3 justify-center">
-                    <button
-                      onClick={() => {
-                        setEditingProduct(product);
-                        handleEdit(product);
-                      }}
-                      className="btn btn-accent rounded-lg"
-                    >
-                      Update
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(product._id)}
-                      className="btn btn-primary rounded-lg"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
+        {products.length == 0 ? (
+          <div className="my-10 flex flex-col justify-center items-center space-y-4 text-center">
+            <p className="text-lg font-medium text-gray-600">
+              Oops! You haven’t added any products yet.
+            </p>
+            <Link to="/add-product" className="btn btn-accent rounded-xl">
+              Add your first product
+            </Link>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-base-300">
+            {/* Table Head */}
+            <thead className="bg-base-200">
+              <tr>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
+                  Image
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
+                  Category
+                </th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-base-content uppercase tracking-wider">
+                  Price
+                </th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-base-content uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>}
+            </thead>
+
+            {/* Table Body */}
+            <tbody className="bg-base-100 divide-y divide-base-300">
+              {products.map((product) => (
+                <tr
+                  key={product._id}
+                  className="hover:bg-base-200 transition duration-200"
+                >
+                  <td className="px-6 py-4">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-16 h-16 object-cover rounded-lg border border-base-300 shadow-sm"
+                    />
+                  </td>
+                  <td className="px-6 py-4 text-base-content font-medium">
+                    {product.name}
+                  </td>
+                  <td className="px-6 py-4 text-base-content font-medium">
+                    {product.category}
+                  </td>
+                  <td className="px-6 py-4 text-accent font-semibold">
+                    ${product.price.toFixed(2)}
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <div className="flex gap-3 justify-center">
+                      <button
+                        onClick={() => {
+                          setEditingProduct(product);
+                          handleEdit(product);
+                        }}
+                        className="btn btn-accent rounded-lg"
+                      >
+                        Update
+                      </button>
+
+                      <button
+                        onClick={() => handleDelete(product._id)}
+                        className="btn btn-primary rounded-lg"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/*! modal for update */}

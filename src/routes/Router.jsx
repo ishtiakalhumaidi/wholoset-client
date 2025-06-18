@@ -13,6 +13,7 @@ import Loader from "../components/common/Loader";
 import Error404 from "../pages/error/Error404";
 import Category from "../pages/Category";
 import MyOrder from "../pages/MyOrder";
+import UserProfile from "../pages/UserProfile";
 
 export const router = createBrowserRouter([
   {
@@ -77,8 +78,20 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "my-profile",
+        element: (
+          <PrivateRoute>
+            <UserProfile />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: "my-cart",
-        Component: CartPage,
+        element: (
+          <PrivateRoute>
+            <CartPage />
+          </PrivateRoute>
+        ),
       },
       {
         path: "product-details/:id",

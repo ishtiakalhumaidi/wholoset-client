@@ -2,12 +2,13 @@ import React, { useEffect, useState, useContext } from "react";
 
 import { AuthContext } from "../contexts/AuthContext";
 import Loader from "../components/common/Loader";
-import getMyOrder from "../utils/getMyOrder";
+import useMyOrderApi from "../api/useMyOrderApi";
 
 const MyOrder = () => {
   const { user } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { getMyOrder } = useMyOrderApi();
 
   useEffect(() => {
     if (user?.email) {
@@ -21,7 +22,7 @@ const MyOrder = () => {
           setLoading(false);
         });
     }
-  }, [user?.email]);
+  }, [user, getMyOrder]);
 
   if (loading) {
     return <Loader />;

@@ -7,10 +7,11 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 const SignIn = () => {
   const { logIn, googleLogIn, isLoading } = useContext(AuthContext);
-
+  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(null);
 
   const location = useLocation();
@@ -132,21 +133,29 @@ const SignIn = () => {
             </div>
 
             {/* Password */}
-            <div className="form-control">
-              <label className="label flex justify-between">
+            <div className="relative form-control">
+              <label className=" label flex justify-between">
                 <span className="label-text text-base-content">Password</span>
-                <a href="#" className="link link-hover text-sm text-accent">
-                  Forgot password?
-                </a>
               </label>
               <input
-                type="password"
+                type={showPass ? "text" : "password"}
                 placeholder="Enter your password"
-                className="input border-base-content w-full focus:outline-0 focus:border-accent"
+                className=" input border-base-content w-full focus:outline-0 focus:border-accent"
                 {...register("password", {
                   required: "Password is required",
                 })}
               />
+              {showPass ? (
+                <FaRegEyeSlash
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-2 top-9 "
+                />
+              ) : (
+                <FaRegEye
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-2 top-9 "
+                />
+              )}
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}

@@ -7,10 +7,12 @@ import { useForm } from "react-hook-form";
 import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 const SignUp = () => {
   const { googleLogIn, isLoading, createUser, updateUserData } =
     useContext(AuthContext);
+  const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const {
@@ -181,12 +183,12 @@ const SignUp = () => {
             </div>
 
             {/* Password */}
-            <div className="form-control">
+            <div className="relative form-control">
               <label className="label">
                 <span className="label-text text-base-content">Password</span>
               </label>
               <input
-                type="password"
+                type={showPass ? "text" : "password"}
                 placeholder="Create a password"
                 className="input border-base-content w-full focus:outline-0 focus:border-accent"
                 {...register("password", {
@@ -198,6 +200,17 @@ const SignUp = () => {
                   },
                 })}
               />
+              {showPass ? (
+                <FaRegEyeSlash
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-2 top-9 "
+                />
+              ) : (
+                <FaRegEye
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-2 top-9 "
+                />
+              )}
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">
                   {errors.password.message}
