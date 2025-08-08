@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000/",
+  baseURL: "https://wholoset-server.vercel.app/",
 });
 
 const useAxiosSecure = () => {

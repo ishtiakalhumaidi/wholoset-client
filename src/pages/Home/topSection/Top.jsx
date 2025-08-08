@@ -13,7 +13,7 @@ const Top = ({ category }) => {
   useEffect(() => {
     axios
       .get(
-        `http://localhost:3000/top-products?category=${category.toLowerCase()}`
+        `https://wholoset-server.vercel.app/top-products?category=${category.toLowerCase()}`
       )
       .then((res) => {
         setProducts(res.data);

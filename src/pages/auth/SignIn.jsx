@@ -57,7 +57,7 @@ const SignIn = () => {
         };
 
         axios
-          .post("http://localhost:3000/users", data)
+          .post("https://wholoset-server.vercel.app/users", data)
           .then((res) => {
             // console.log("User saved:", res.data);
           })

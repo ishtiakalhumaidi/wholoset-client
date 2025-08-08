@@ -50,7 +50,7 @@ const MyProduct = () => {
       if (result.isConfirmed) {
         axios
           .put(
-            `http://localhost:3000/update-product/${editingProduct._id}`,
+            `https://wholoset-server.vercel.app/update-product/${editingProduct._id}`,
             updatedProduct
           )
           .then((result) => {
@@ -87,7 +87,7 @@ const MyProduct = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .delete(`http://localhost:3000/delete-product/${id}`)
+          .delete(`https://wholoset-server.vercel.app/delete-product/${id}`)
           .then((res) => {
             console.log(res.data);
             if (res.data.deletedCount) {

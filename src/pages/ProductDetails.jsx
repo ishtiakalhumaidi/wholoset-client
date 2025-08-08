@@ -20,7 +20,9 @@ const ProductDetails = () => {
   } = useQuery({
     queryKey: ["product", id],
     queryFn: () =>
-      axios.get(`http://localhost:3000/products/${id}`).then((res) => res.data),
+      axios
+        .get(`https://wholoset-server.vercel.app/products/${id}`)
+        .then((res) => res.data),
     enabled: !!id,
   });
 
@@ -62,12 +64,14 @@ const ProductDetails = () => {
     },
   });
 
-  // Mutation for adding product to cart
+
   const addToCartMutation = useMutation({
     mutationFn: (data) =>
-      axios.patch(`http://localhost:3000/users/cart?email=${user.email}`, data),
+      axios.patch(
+        `https://wholoset-server.vercel.app/users/cart?email=${user.email}`,
+        data
+      ),
     onSuccess: () => {
-      // Refetch product and cart data after adding to cart
       queryClient.invalidateQueries({ queryKey: ["cartProducts", user.email] });
       refetch();
       Swal.fire({
@@ -87,11 +91,11 @@ const ProductDetails = () => {
     },
   });
 
-  // Mutation for purchase
+
   const purchaseMutation = useMutation({
     mutationFn: (purchaseData) =>
       axios.patch(
-        `http://localhost:3000/users/buy?email=${user.email}`,
+        `https://wholoset-server.vercel.app/users/buy?email=${user.email}`,
         purchaseData
       ),
     onSuccess: () => {

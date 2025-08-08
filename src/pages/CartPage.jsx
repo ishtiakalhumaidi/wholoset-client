@@ -3,15 +3,17 @@ import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { FaTrashAlt } from "react-icons/fa";
 import { AuthContext } from "../contexts/AuthContext";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import useCartProductsApi from "../api/useCartProductsApi";
 import Loader from "../components/common/Loader";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Swal from "sweetalert2";
 
 const CartPage = () => {
   const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
   const { getCartProducts } = useCartProductsApi();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -19,42 +21,97 @@ const CartPage = () => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    // TODO: Implement checkout submission logic here
-  };
-
+  // Fetch cart products query
   const { data: cartProducts = [], isLoading } = useQuery({
     queryKey: ["cartProducts", user?.email],
-    queryFn: () => (user?.email ? getCartProducts(user.email) : Promise.resolve([])),
+    queryFn: () =>
+      user?.email ? getCartProducts(user.email) : Promise.resolve([]),
     enabled: !!user?.email,
   });
 
+  // Calculate totals
   const subtotal = cartProducts.reduce(
     (sum, p) => sum + (p.price || 0) * (p.quantity || 1),
     0
   );
-
   const shipping = subtotal === 0 ? 0 : 6;
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
 
   const updateCartMutation = useMutation({
     mutationFn: (data) =>
-      axios.patch(`http://localhost:3000/users/cart?email=${user.email}`, data),
+      axios.patch(
+        `https://wholoset-server.vercel.app/users/cart?email=${user.email}`,
+        data
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries(["cartProducts", user.email]);
     },
   });
 
+  const checkoutMutation = useMutation({
+    mutationFn: (checkoutData) =>
+      axios.patch(
+        `https://wholoset-server.vercel.app/users/buy?email=${user.email}`,
+        checkoutData
+      ),
+    onSuccess: (res) => {
+      if (res.data.message === "Checkout successful") {
+        Swal.fire({
+          icon: "success",
+          title: "Checkout Completed",
+          text: "Your order has been placed successfully!",
+          confirmButtonColor: "#34c38f",
+        }).then(() => {
+          navigate(`/my-orders/${user.email}`);
+        });
+
+        queryClient.invalidateQueries(["cartProducts", user.email]);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Checkout Failed",
+          text: res.data.message || "Something went wrong",
+          confirmButtonColor: "#f25c54",
+        });
+      }
+    },
+    onError: (error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Checkout Failed",
+        text:
+          error.response?.data?.message ||
+          error.message ||
+          "An unexpected error occurred",
+        confirmButtonColor: "#f25c54",
+      });
+    },
+  });
+
+  // Handler for increasing, decreasing, or deleting single product from cart
   const handleIncreaseDecrease = (data) => {
     updateCartMutation.mutate(data);
+  };
+
+  // Checkout form submission
+  const onSubmit = (data) => {
+    if (cartProducts.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "Cart is empty",
+        text: "Please add products before checking out.",
+        confirmButtonColor: "#f25c54",
+      });
+      return;
+    }
+    checkoutMutation.mutate(data);
   };
 
   if (isLoading) return <Loader />;
 
   return (
-    <div className="grid md:grid-cols-3 gap-6 p-6 bg-base-100">
+    <div className="grid md:grid-cols-3 gap-6 p-6 bg-base-100 min-h-screen">
       <title>Your Cart | Wholoset</title>
       {/* Left: Cart Items */}
       <div className="md:col-span-2 space-y-4">
@@ -203,7 +260,9 @@ const CartPage = () => {
 
           {/* Full Name */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">Full Name</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Full Name
+            </span>
             <input
               {...register("fullName", { required: "Full name is required" })}
               type="text"
@@ -211,7 +270,9 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.fullName && (
-              <span className="text-red-500 text-sm">{errors.fullName.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.fullName.message}
+              </span>
             )}
           </label>
 
@@ -231,13 +292,17 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.email && (
-              <span className="text-red-500 text-sm">{errors.email.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.email.message}
+              </span>
             )}
           </label>
 
           {/* Phone Number */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">Phone Number</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Phone Number
+            </span>
             <div className="flex gap-2">
               <select
                 {...register("countryCode")}
@@ -261,7 +326,9 @@ const CartPage = () => {
               />
             </div>
             {errors.phone && (
-              <span className="text-red-500 text-sm">{errors.phone.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.phone.message}
+              </span>
             )}
           </label>
 
@@ -282,7 +349,9 @@ const CartPage = () => {
 
           {/* Address */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">Full Address</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Full Address
+            </span>
             <input
               {...register("address", { required: "Address is required" })}
               type="text"
@@ -290,13 +359,17 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.address && (
-              <span className="text-red-500 text-sm">{errors.address.message}</span>
+              <span className="text-red-500 text-sm">
+                {errors.address.message}
+              </span>
             )}
           </label>
 
           {/* Payment */}
           <div className="form-control flex items-start gap-3">
-            <span className="label-text font-medium text-sm mb-1">Payment Method</span>
+            <span className="label-text font-medium text-sm mb-1">
+              Payment Method
+            </span>
             <label className="label cursor-pointer gap-2">
               <input
                 {...register("paymentMethod", { required: true })}
@@ -313,11 +386,15 @@ const CartPage = () => {
           <button
             type="submit"
             className="btn btn-primary w-full rounded-xl mt-3"
-            disabled={updateCartMutation.isLoading}
+            disabled={checkoutMutation.isLoading}
           >
-            Checkout
+            {checkoutMutation.isLoading ? "Processing..." : "Checkout"}
           </button>
-          <button type="button" className="btn btn-outline w-full rounded-xl">
+          <button
+            type="button"
+            className="btn btn-outline w-full rounded-xl"
+            onClick={() => navigate("/all-product")}
+          >
             Continue Shopping
           </button>
         </form>

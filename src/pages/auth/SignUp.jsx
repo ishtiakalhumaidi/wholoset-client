@@ -66,7 +66,7 @@ const SignUp = () => {
           theme: "colored",
           transition: Bounce,
         });
-        return axios.post("http://localhost:3000/users", userData);
+        return axios.post("https://wholoset-server.vercel.app/users", userData);
       })
       .then((res) => {
         // console.log("User saved:", res.data);
@@ -100,7 +100,7 @@ const SignUp = () => {
         };
 
         axios
-          .post("http://localhost:3000/users", data)
+          .post("https://wholoset-server.vercel.app/users", data)
           .then((res) => {
             // console.log("User saved:", res.data);
           })

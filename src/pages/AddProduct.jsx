@@ -1,24 +1,47 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../contexts/AuthContext";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router";
+import { imageUpload } from "../api/imageUpload";
 
 const AddProduct = () => {
   const { user } = useContext(AuthContext);
+  const [uploadedImageError, setUploadedImageError] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm();
+
   const navigate = useNavigate();
 
+  const handleImageUpload = async (e) => {
+    e.preventDefault();
+    setIsUploading(true);
+    setImagePreview(null);
+    setUploadedImageError(null);
+    const image = e.target.files[0];
+    try {
+      const imageURL = await imageUpload(image);
+      setImagePreview(imageURL);
+      setValue("image", imageURL);
+    } catch (err) {
+      setUploadedImageError("Image Upload Failed: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const onSubmit = async (data) => {
-    console.log("Product Submitted:", data);
     if (parseFloat(data.oldPrice) < parseFloat(data.price)) {
-      alert("Old Price Should to be Greater Thn New Price");
+      alert("Old Price Should be Greater Than New Price");
       return;
     }
     const newProduct = {
@@ -42,8 +65,8 @@ const AddProduct = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .post("http://localhost:3000/add-products", newProduct)
-          .then((result) => {
+          .post("https://wholoset-server.vercel.app/add-products", newProduct)
+          .then(() => {
             Swal.fire({
               title: "Added!",
               confirmButtonColor: "#34c38f",
@@ -53,130 +76,147 @@ const AddProduct = () => {
             navigate("/my-product");
           })
           .catch((error) => {
-            console.log(error.code);
+            console.error(error);
           });
         reset();
+        setImagePreview(null);
       }
     });
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-8 my-10 bg-white dark:bg-base-200 rounded-2xl shadow-xl">
-      <title>Add Product | Wholoset</title>
-      <h2 className="text-4xl font-bold text-center text-primary mb-10 font-secondary">
+    <div className="max-w-4xl mx-auto p-10 my-12 bg-white dark:bg-base-200 rounded-3xl shadow-lg">
+      <h2 className="text-4xl font-bold text-center text-primary mb-12 font-secondary">
         Submit New Product
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* Image & Name */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Image Upload */}
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
-              Product Image URL
-            </span>
-            <input
-              type="url"
-              {...register("image", { required: "Image URL is required" })}
-              placeholder="https://example.com/image.jpg"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
-            />
-            {errors.image && (
-              <span className="text-red-500 text-sm mt-1">
-                {errors.image.message}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        {/* IMAGE UPLOAD */}
+        <div className="flex flex-col items-center">
+          <label
+            htmlFor="avatar"
+            className="cursor-pointer max-w-full min-w-96 min-h-44 rounded-xl border-1 border-dashed  flex items-center justify-center overflow-hidden bg-base-100 hover:bg-primary/10 transition"
+            title="Click to upload product image"
+          >
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Uploaded preview"
+                className="w-full h-full object-cover rounded-xl"
+              />
+            ) : (
+              <span className="text-primary font-semibold">
+                {isUploading ? "Uploading..." : "Click to Upload Image"}
               </span>
             )}
-          </label>
-
-          {/* Product Name */}
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
-              Product Name
-            </span>
             <input
-              type="text"
-              {...register("name", { required: "Product name is required" })}
-              placeholder="e.g. Industrial Drill Machine"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              type="file"
+              id="avatar"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
             />
-            {errors.name && (
-              <span className="text-red-500 text-sm mt-1">
-                {errors.name.message}
-              </span>
-            )}
           </label>
+          {uploadedImageError && (
+            <p className="text-red-600 text-sm mt-2">{uploadedImageError}</p>
+          )}
+          {errors.image && (
+            <span className="text-error text-sm mt-1">
+              {errors.image.message}
+            </span>
+          )}
         </div>
 
-        {/* Quantity & Min Quantity */}
+        {/* HIDDEN IMAGE URL INPUT */}
+        <input
+          type="hidden"
+          {...register("image", { required: "Image URL is required" })}
+        />
+
+        {/* PRODUCT NAME */}
+        <div>
+          <label className="block text-base-content font-semibold mb-2">
+            Product Name
+          </label>
+          <input
+            type="text"
+            placeholder="Industrial Drill Machine"
+            {...register("name", { required: "Product name is required" })}
+            className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          />
+          {errors.name && (
+            <p className="text-error text-sm mt-1">{errors.name.message}</p>
+          )}
+        </div>
+
+        {/* QUANTITY */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Main Quantity
-            </span>
+            </label>
             <input
               type="number"
               min="1"
+              placeholder="100"
               {...register("mainQuantity", {
                 required: "Main quantity is required",
               })}
-              placeholder="e.g. 100"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.mainQuantity && (
-              <span className="text-red-500 text-sm mt-1">
+              <p className="text-error text-sm mt-1">
                 {errors.mainQuantity.message}
-              </span>
+              </p>
             )}
-          </label>
+          </div>
 
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Minimum Selling Quantity
-            </span>
+            </label>
             <input
               type="number"
               min="1"
+              placeholder="10"
               {...register("minQuantity", {
                 required: "Minimum quantity is required",
               })}
-              placeholder="e.g. 10"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.minQuantity && (
-              <span className="text-red-500 text-sm mt-1">
+              <p className="text-error text-sm mt-1">
                 {errors.minQuantity.message}
-              </span>
+              </p>
             )}
-          </label>
+          </div>
         </div>
 
-        {/* Brand & Category */}
+        {/* BRAND & CATEGORY */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Brand Name
-            </span>
+            </label>
             <input
               type="text"
+              placeholder="Bunngle Ltd."
               {...register("brand", { required: "Brand name is required" })}
-              placeholder="e.g. Bunngle Ltd."
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.brand && (
-              <span className="text-red-500 text-sm mt-1">
-                {errors.brand.message}
-              </span>
+              <p className="text-error text-sm mt-1">{errors.brand.message}</p>
             )}
-          </label>
+          </div>
 
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Category
-            </span>
+            </label>
             <select
               {...register("category", { required: "Select a category" })}
-              className="select select-bordered w-full focus:outline-0 focus:border-accent rounded-xl"
               defaultValue=""
+              className="select select-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             >
               <option disabled value="">
                 Choose a Category
@@ -191,98 +231,95 @@ const AddProduct = () => {
               <option>Sporting Goods</option>
             </select>
             {errors.category && (
-              <span className="text-red-500 text-sm mt-1">
+              <p className="text-error text-sm mt-1">
                 {errors.category.message}
-              </span>
+              </p>
             )}
-          </label>
+          </div>
         </div>
 
-        {/* Description */}
-        <label className="form-control w-full">
-          <span className="label-text font-semibold text-base-content mb-1">
+        {/* DESCRIPTION */}
+        <div>
+          <label className="block text-base-content font-semibold mb-2">
             Short Description
-          </span>
+          </label>
           <textarea
             {...register("description", {
               required: "Description is required",
               maxLength: 300,
             })}
-            placeholder="Briefly describe the product (max 300 chars)"
-            className="textarea textarea-bordered w-full focus:outline-0 focus:border-accent rounded-xl mb-2"
             rows={4}
+            placeholder="Briefly describe the product (max 300 chars)"
+            className="textarea textarea-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />
           {errors.description && (
-            <span className="text-red-500 text-sm mt-1">
+            <p className="text-error text-sm mt-1">
               {errors.description.message}
-            </span>
+            </p>
           )}
-        </label>
+        </div>
 
-        {/* Price & Rating */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+        {/* PRICE & RATING */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Old Price (Per Unit)
-            </span>
+            </label>
             <input
               type="number"
               step="0.01"
+              placeholder="59.99"
               {...register("oldPrice", { required: "Old Price is required" })}
-              placeholder="e.g. 59.99"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.oldPrice && (
-              <span className="text-red-500 text-sm mt-1">
+              <p className="text-error text-sm mt-1">
                 {errors.oldPrice.message}
-              </span>
+              </p>
             )}
-          </label>
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+          </div>
+
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Price (Per Unit)
-            </span>
+            </label>
             <input
               type="number"
               step="0.01"
+              placeholder="49.99"
               {...register("price", { required: "Price is required" })}
-              placeholder="e.g. 49.99"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.price && (
-              <span className="text-red-500 text-sm mt-1">
-                {errors.price.message}
-              </span>
+              <p className="text-error text-sm mt-1">{errors.price.message}</p>
             )}
-          </label>
+          </div>
 
-          <label className="form-control w-full">
-            <span className="label-text font-semibold text-base-content mb-1">
+          <div>
+            <label className="block text-base-content font-semibold mb-2">
               Rating (1-5)
-            </span>
+            </label>
             <input
               type="number"
               min="1"
               max="5"
               step="0.1"
+              placeholder="4.5"
               {...register("rating", {
                 required: "Rating is required",
                 min: 1,
                 max: 5,
               })}
-              placeholder="4.5"
-              className="focus:outline-0 focus:border-accent input input-bordered w-full rounded-xl"
+              className="input input-bordered w-full rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {errors.rating && (
-              <span className="text-red-500 text-sm mt-1">
-                {errors.rating.message}
-              </span>
+              <p className="text-error text-sm mt-1">{errors.rating.message}</p>
             )}
-          </label>
+          </div>
         </div>
 
-        {/* Static Note */}
-        <div className="p-5 bg-base-100 border rounded-xl text-sm text-accent ">
+        {/* NOTE */}
+        <div className="bg-base-100 border border-primary rounded-xl p-5 text-primary text-sm font-medium">
           <p>
             <strong>Note:</strong> Products added here will be reviewed before
             publishing on our wholesale platform. Ensure all information is
@@ -290,9 +327,13 @@ const AddProduct = () => {
           </p>
         </div>
 
-        {/* Submit */}
-        <button className="btn btn-primary w-full rounded-xl text-lg font-semibold">
-          Add Product
+        {/* SUBMIT BUTTON */}
+        <button
+          type="submit"
+          disabled={isUploading}
+          className="btn btn-primary w-full rounded-xl text-lg font-semibold"
+        >
+          {isUploading ? "Uploading Image..." : "Add Product"}
         </button>
       </form>
     </div>

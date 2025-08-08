@@ -35,7 +35,7 @@ export const router = createBrowserRouter([
       {
         path: "category/:name",
         loader: ({ params }) =>
-          fetch(`http://localhost:3000/category/${params.name}`),
+          fetch(`https://wholoset-server.vercel.app/category/${params.name}`),
         element: (
           <PrivateRoute>
             <Category />
@@ -55,7 +55,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "all-product",
-        loader: () => fetch("http://localhost:3000/products"),
+        loader: () => fetch("https://wholoset-server.vercel.app/products"),
         element: <AllProduct />,
         hydrateFallbackElement: <Loader />,
       },
