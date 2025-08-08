@@ -4,27 +4,37 @@ import { useNavigate, useParams } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 import Swal from "sweetalert2";
 import { useForm } from "react-hook-form";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const ProductDetails = () => {
   const { user } = useContext(AuthContext);
-  const [product, setProduct] = useState({});
-  const [quantity, setQuantity] = useState(0);
   const navigate = useNavigate();
-
+  const queryClient = useQueryClient();
   const { id } = useParams();
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3000/products/${id}`)
-      .then((res) => {
-        setProduct(res.data);
-        setQuantity(res.data.minQuantity || 0);
-      })
-      .catch((err) => {
-        console.error("Fetching error", err);
-      });
-  }, [id]);
+  // React Query to fetch product details (v5 object form)
+  const {
+    data: product = {},
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["product", id],
+    queryFn: () =>
+      axios.get(`http://localhost:3000/products/${id}`).then((res) => res.data),
+    enabled: !!id,
+  });
 
+  // Local state for quantity
+  const [quantity, setQuantity] = useState(0);
+
+  // Update quantity when product loads or changes
+  React.useEffect(() => {
+    if (product.minQuantity) {
+      setQuantity(product.minQuantity);
+    }
+  }, [product.minQuantity]);
+
+  // Quantity validation
   const isTooLow = quantity < product.minQuantity;
   const isTooHigh = quantity > product.mainQuantity;
   const isInvalid = isTooLow || isTooHigh;
@@ -42,13 +52,66 @@ const ProductDetails = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fullName: user?.displayName,
+      fullName: user?.displayName || "",
       email: user?.email || "",
       countryCode: "+1",
       phone: "",
       country: "Bangladesh",
       address: "",
       paymentMethod: "Cash on Delivery",
+    },
+  });
+
+  // Mutation for adding product to cart
+  const addToCartMutation = useMutation({
+    mutationFn: (data) =>
+      axios.patch(`http://localhost:3000/users/cart?email=${user.email}`, data),
+    onSuccess: () => {
+      // Refetch product and cart data after adding to cart
+      queryClient.invalidateQueries({ queryKey: ["cartProducts", user.email] });
+      refetch();
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Product has been added to your cart.",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    },
+    onError: (error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Error adding to cart",
+        text: error.message || "Something went wrong",
+      });
+    },
+  });
+
+  // Mutation for purchase
+  const purchaseMutation = useMutation({
+    mutationFn: (purchaseData) =>
+      axios.patch(
+        `http://localhost:3000/users/buy?email=${user.email}`,
+        purchaseData
+      ),
+    onSuccess: () => {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Purchase confirmed!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      queryClient.invalidateQueries({ queryKey: ["cartProducts", user.email] });
+      navigate(`/my-orders/${user.email}`);
+      document.getElementById("my_modal_3")?.close();
+    },
+    onError: (error) => {
+      Swal.fire({
+        icon: "error",
+        title: "Purchase failed",
+        text: error.message || "Invalid quantity or other error",
+      });
     },
   });
 
@@ -68,31 +131,8 @@ const ProductDetails = () => {
       ...data,
       quantity,
     };
-    axios
-      .patch(
-        `http://localhost:3000/users/buy?email=${user.email}`,
-        purchaseData
-      )
-      .then((res) => {
-        console.log(res.data);
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Purchase confirmed!",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        navigate(`/my-orders/${user.email}`);
-      })
-      .catch((err) => {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid quantity",
-          text: `${err.message}`,
-        });
-      });
 
-    document.getElementById("my_modal_3").close();
+    purchaseMutation.mutate(purchaseData);
   };
 
   const increaseQty = () => {
@@ -103,28 +143,20 @@ const ProductDetails = () => {
   };
 
   const handleAddCart = () => {
-    const data = { productId: id, quantity, action: "add" };
-    axios
-      .patch(`http://localhost:3000/users/cart?email=${user.email}`, data)
-      .then((res) => {
-        console.log(res.data);
-
-        return axios.get(`http://localhost:3000/products/${id}`);
-      })
-      .then((res) => {
-        setProduct(res.data);
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Product has been added to your cart.",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      })
-      .catch((err) => {
-        console.error("An error occurred", err);
+    if (isInvalid) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid quantity",
+        text: `Please select quantity between ${product.minQuantity} and ${product.mainQuantity}`,
       });
+      return;
+    }
+    addToCartMutation.mutate({ productId: id, quantity, action: "add" });
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="max-w-6xl mx-auto p-6 md:p-10 bg-white dark:bg-base-200 rounded-2xl shadow-xl my-10">
@@ -214,9 +246,9 @@ const ProductDetails = () => {
             <button
               className="btn btn-secondary rounded-xl font-primary"
               onClick={handleAddCart}
-              disabled={isInvalid}
+              disabled={isInvalid || addToCartMutation.isLoading}
             >
-              Add to Cart
+              {addToCartMutation.isLoading ? "Adding..." : "Add to Cart"}
             </button>
             <button
               className="btn btn-primary rounded-xl font-primary"
@@ -232,7 +264,7 @@ const ProductDetails = () => {
       {/* Modal */}
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box relative">
-          {/* Close button outside form */}
+          {/* Close button */}
           <button
             type="button"
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -394,9 +426,11 @@ const ProductDetails = () => {
             <button
               type="submit"
               className="btn btn-primary w-full rounded-xl mt-4"
-              disabled={isInvalid}
+              disabled={isInvalid || purchaseMutation.isLoading}
             >
-              Confirm Purchase
+              {purchaseMutation.isLoading
+                ? "Processing..."
+                : "Confirm Purchase"}
             </button>
           </form>
         </div>

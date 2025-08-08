@@ -1,17 +1,17 @@
 import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { FaTrashAlt } from "react-icons/fa";
 import { AuthContext } from "../contexts/AuthContext";
 import { Link } from "react-router";
 import useCartProductsApi from "../api/useCartProductsApi";
 import Loader from "../components/common/Loader";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CartPage = () => {
+  const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
   const { getCartProducts } = useCartProductsApi();
-  const [subtotal, setSubtotal] = useState(0);
-  const [loading, setLoading] = useState(true);
 
   const {
     register,
@@ -21,59 +21,38 @@ const CartPage = () => {
 
   const onSubmit = (data) => {
     console.log("Form Data:", data);
-    // send to backend later
+    // TODO: Implement checkout submission logic here
   };
 
-  const [cartProducts, setCartProducts] = useState([]);
+  const { data: cartProducts = [], isLoading } = useQuery({
+    queryKey: ["cartProducts", user?.email],
+    queryFn: () => (user?.email ? getCartProducts(user.email) : Promise.resolve([])),
+    enabled: !!user?.email,
+  });
 
-  const shipping = subtotal == 0 ? 0 : 6;
+  const subtotal = cartProducts.reduce(
+    (sum, p) => sum + (p.price || 0) * (p.quantity || 1),
+    0
+  );
+
+  const shipping = subtotal === 0 ? 0 : 6;
   const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
-  console.log(cartProducts);
 
-  useEffect(() => {
-    if (!cartProducts || cartProducts.length === 0) {
-      setSubtotal(0);
-      return;
-    }
-
-    const newTotal = cartProducts.reduce((sum, element) => {
-      if (!element) return sum;
-      return sum + element.price * element.quantity;
-    }, 0);
-
-    setSubtotal(newTotal);
-  }, [cartProducts]);
-
-  useEffect(() => {
-    if (!user?.email) return;
-    setLoading(true);
-    const fetchCart = async () => {
-      const data = await getCartProducts(user.email);
-      setCartProducts(data);
-      setLoading(false);
-    };
-
-    fetchCart();
-  }, [user?.email]);
+  const updateCartMutation = useMutation({
+    mutationFn: (data) =>
+      axios.patch(`http://localhost:3000/users/cart?email=${user.email}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["cartProducts", user.email]);
+    },
+  });
 
   const handleIncreaseDecrease = (data) => {
-    console.log(data);
-    axios
-      .patch(`http://localhost:3000/users/cart?email=${user.email}`, data)
-      .then(() => {
-        return getCartProducts(user.email);
-      })
-      .then((updatedCart) => {
-        setCartProducts(updatedCart);
-      })
-      .catch((err) => {
-        console.error("An error occurred", err);
-      });
+    updateCartMutation.mutate(data);
   };
-  if (loading) {
-    return <Loader />;
-  }
+
+  if (isLoading) return <Loader />;
+
   return (
     <div className="grid md:grid-cols-3 gap-6 p-6 bg-base-100">
       <title>Your Cart | Wholoset</title>
@@ -81,7 +60,7 @@ const CartPage = () => {
       <div className="md:col-span-2 space-y-4">
         <h2 className="text-2xl font-bold mb-4">Your Cart</h2>
 
-        {cartProducts.length == 0 ? (
+        {cartProducts.length === 0 ? (
           <div className="my-10 flex flex-col justify-center items-center space-y-4 text-center">
             <p className="text-lg font-medium text-gray-600">
               Your cart is currently empty.
@@ -122,6 +101,7 @@ const CartPage = () => {
                           action: "remove",
                         })
                       }
+                      disabled={updateCartMutation.isLoading}
                       className="btn btn-sm btn-outline btn-square rounded-xl"
                     >
                       −
@@ -136,6 +116,7 @@ const CartPage = () => {
                           action: "add",
                         })
                       }
+                      disabled={updateCartMutation.isLoading}
                       className="btn btn-sm btn-outline btn-square rounded-xl"
                     >
                       +
@@ -147,6 +128,7 @@ const CartPage = () => {
                           action: "delete",
                         })
                       }
+                      disabled={updateCartMutation.isLoading}
                       className="btn btn-sm btn-ghost text-error text-xl rounded-xl"
                     >
                       <FaTrashAlt />
@@ -180,6 +162,7 @@ const CartPage = () => {
                           action: "delete",
                         })
                       }
+                      disabled={updateCartMutation.isLoading}
                       className="btn btn-sm btn-ghost text-error text-xl rounded-xl"
                     >
                       <FaTrashAlt />
@@ -220,9 +203,7 @@ const CartPage = () => {
 
           {/* Full Name */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">
-              Full Name
-            </span>
+            <span className="label-text font-medium text-sm mb-1">Full Name</span>
             <input
               {...register("fullName", { required: "Full name is required" })}
               type="text"
@@ -230,9 +211,7 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.fullName && (
-              <span className="text-red-500 text-sm">
-                {errors.fullName.message}
-              </span>
+              <span className="text-red-500 text-sm">{errors.fullName.message}</span>
             )}
           </label>
 
@@ -252,17 +231,13 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.email && (
-              <span className="text-red-500 text-sm">
-                {errors.email.message}
-              </span>
+              <span className="text-red-500 text-sm">{errors.email.message}</span>
             )}
           </label>
 
           {/* Phone Number */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">
-              Phone Number
-            </span>
+            <span className="label-text font-medium text-sm mb-1">Phone Number</span>
             <div className="flex gap-2">
               <select
                 {...register("countryCode")}
@@ -278,10 +253,7 @@ const CartPage = () => {
               <input
                 {...register("phone", {
                   required: "Phone number is required",
-                  minLength: {
-                    value: 7,
-                    message: "Too short",
-                  },
+                  minLength: { value: 7, message: "Too short" },
                 })}
                 type="tel"
                 placeholder="1234567890"
@@ -289,9 +261,7 @@ const CartPage = () => {
               />
             </div>
             {errors.phone && (
-              <span className="text-red-500 text-sm">
-                {errors.phone.message}
-              </span>
+              <span className="text-red-500 text-sm">{errors.phone.message}</span>
             )}
           </label>
 
@@ -312,9 +282,7 @@ const CartPage = () => {
 
           {/* Address */}
           <label className="form-control w-full">
-            <span className="label-text font-medium text-sm mb-1">
-              Full Address
-            </span>
+            <span className="label-text font-medium text-sm mb-1">Full Address</span>
             <input
               {...register("address", { required: "Address is required" })}
               type="text"
@@ -322,17 +290,13 @@ const CartPage = () => {
               className="input input-bordered rounded-xl w-full focus:outline-secondary"
             />
             {errors.address && (
-              <span className="text-red-500 text-sm">
-                {errors.address.message}
-              </span>
+              <span className="text-red-500 text-sm">{errors.address.message}</span>
             )}
           </label>
 
           {/* Payment */}
           <div className="form-control flex items-start gap-3">
-            <span className="label-text font-medium text-sm mb-1">
-              Payment Method
-            </span>
+            <span className="label-text font-medium text-sm mb-1">Payment Method</span>
             <label className="label cursor-pointer gap-2">
               <input
                 {...register("paymentMethod", { required: true })}
@@ -349,6 +313,7 @@ const CartPage = () => {
           <button
             type="submit"
             className="btn btn-primary w-full rounded-xl mt-3"
+            disabled={updateCartMutation.isLoading}
           >
             Checkout
           </button>
