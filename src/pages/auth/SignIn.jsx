@@ -15,7 +15,6 @@ const SignIn = () => {
   const [error, setError] = useState(null);
 
   const location = useLocation();
-  console.log(location);
   const navigate = useNavigate();
 
   const {
@@ -25,7 +24,7 @@ const SignIn = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
+    // console.log("Form Data:", data);
     logIn(data.email, data.password)
       .then((result) => {
         toast.success("You have been signin successfully!", {
@@ -40,7 +39,7 @@ const SignIn = () => {
           transition: Bounce,
         });
         location.state ? navigate(location.state) : navigate("/");
-        console.log(result.user);
+        // console.log(result.user);
       })
       .catch((error) => {
         console.log(error.code);
@@ -60,7 +59,7 @@ const SignIn = () => {
         axios
           .post("http://localhost:3000/users", data)
           .then((res) => {
-            console.log("User saved:", res.data);
+            // console.log("User saved:", res.data);
           })
           .catch((err) => {
             console.error("User didn't add", err);
@@ -77,7 +76,7 @@ const SignIn = () => {
           transition: Bounce,
         });
         location.state ? navigate(location.state) : navigate("/");
-        console.log(result.user);
+        // console.log(result.user);
       })
       .catch((error) => {
         setError(error.code);

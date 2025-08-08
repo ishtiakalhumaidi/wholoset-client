@@ -6,6 +6,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import axios from "axios";
 import ProductCard from "../../../components/ui/ProductCard";
+import { Link } from "react-router";
 
 const Top = ({ category }) => {
   const [products, setProducts] = useState([]);
@@ -25,7 +26,9 @@ const Top = ({ category }) => {
     <div className="mb-16">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-semibold text-primary">Top {category}</h3>
-        <button className="btn btn-outline btn-sm">View More</button>
+        <Link to={"/all-product"} className="btn btn-outline btn-sm">
+          View More
+        </Link>
       </div>
 
       <Swiper

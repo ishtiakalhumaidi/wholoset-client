@@ -8,13 +8,33 @@ import { AuthContext } from "../../contexts/AuthContext";
 import axios from "axios";
 import { Bounce, toast } from "react-toastify";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import { FaUpload, FaUser } from "react-icons/fa";
+import { imageUpload } from "../../api/imageUpload";
 
 const SignUp = () => {
   const { googleLogIn, isLoading, createUser, updateUserData } =
     useContext(AuthContext);
   const [showPass, setShowPass] = useState(false);
+  const [uploadedImageError, setUploadedImageError] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const handleImageUpload = async (e) => {
+    e.preventDefault();
+    setIsUploading(true);
+    setImagePreview(null);
+    const image = e.target.files[0];
+    try {
+      const imageURL = await imageUpload(image);
+      setImagePreview(imageURL);
+    } catch (err) {
+      setUploadedImageError("Image Uploaded Failed:", err);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const {
     register,
     handleSubmit,
@@ -22,18 +42,19 @@ const SignUp = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    const { email, password, fullName, photoURL } = data;
+    const { email, password, fullName } = data;
 
     createUser(email, password)
       .then(() => {
-        return updateUserData(fullName, photoURL);
+        return updateUserData(fullName, imagePreview);
       })
       .then(() => {
         const userData = {
           displayName: fullName,
           email,
-          photoURL,
+          photoURL: imagePreview,
         };
+
         toast.success("Your account has been created successfully!", {
           position: "bottom-right",
           autoClose: 5000,
@@ -48,7 +69,7 @@ const SignUp = () => {
         return axios.post("http://localhost:3000/users", userData);
       })
       .then((res) => {
-        console.log("User saved:", res.data);
+        // console.log("User saved:", res.data);
         navigate("/");
       })
       .catch((error) => {
@@ -81,13 +102,13 @@ const SignUp = () => {
         axios
           .post("http://localhost:3000/users", data)
           .then((res) => {
-            console.log("User saved:", res.data);
+            // console.log("User saved:", res.data);
           })
           .catch((err) => {
             console.error("User didn't add", err);
           });
         navigate("/");
-        console.log(result.user);
+        // console.log(result.user);
       })
       .catch((error) => {
         setError(error.code);
@@ -115,6 +136,53 @@ const SignUp = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
+            <div className="flex flex-col items-center space-y-2">
+              <div className="relative group">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 p-1">
+                  <div className="w-full h-full rounded-full bg-base-100 flex items-center justify-center overflow-hidden">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <FaUser className="w-12 h-12 text-primary/20" />
+                    )}
+                  </div>
+                </div>
+                <label
+                  htmlFor="avatar"
+                  className="absolute bottom-0 right-0 w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center cursor-pointer transform transition-transform duration-300 hover:scale-110 hover:shadow-lg"
+                >
+                  <FaUpload
+                    className={`w-4 h-4 ${isUploading && "animate-bounce"}`}
+                  />
+                </label>
+                <input
+                  type="file"
+                  id="avatar"
+                  accept="image/*"
+                  {...register("avatar", {
+                    required: "Profile image is required",
+                  })}
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </div>
+              <span className="text-sm text-base-content/60">
+                Upload your photo
+              </span>
+              {errors.avatar && (
+                <span className="text-error text-sm">
+                  {errors.avatar.message}
+                </span>
+              )}
+            </div>
+
+            {uploadedImageError && (
+              <p className="text-red-500 text-xs">{uploadedImageError}</p>
+            )}
             {/* Full Name */}
             <div className="form-control">
               <label className="label">
@@ -133,30 +201,6 @@ const SignUp = () => {
               )}
             </div>
 
-            {/* photoURL */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text text-base-content">Photo URL</span>
-              </label>
-              <input
-                {...register("photoURL", {
-                  required: "Photo URL is required",
-                  pattern: {
-                    value: /^https:\/\/.+/i,
-                    message: "Please enter a valid image URL.",
-                  },
-                })}
-                type="url"
-                placeholder="https://example.com/photo.jpg"
-                className="input border-base-content w-full focus:outline-0 focus:border-accent"
-              />
-
-              {errors.photoURL && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.photoURL.message}
-                </p>
-              )}
-            </div>
             {/* Email */}
             <div className="form-control">
               <label className="label">

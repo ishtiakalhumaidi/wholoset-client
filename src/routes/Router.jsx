@@ -56,11 +56,7 @@ export const router = createBrowserRouter([
       {
         path: "all-product",
         loader: () => fetch("http://localhost:3000/products"),
-        element: (
-          <PrivateRoute>
-            <AllProduct />
-          </PrivateRoute>
-        ),
+        element: <AllProduct />,
         hydrateFallbackElement: <Loader />,
       },
       {
