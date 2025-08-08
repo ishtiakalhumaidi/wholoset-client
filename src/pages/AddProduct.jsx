@@ -13,7 +13,7 @@ const AddProduct = () => {
     reset,
     formState: { errors },
   } = useForm();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     console.log("Product Submitted:", data);
@@ -50,7 +50,7 @@ const AddProduct = () => {
               text: "Your product has been successfully added.",
               icon: "success",
             });
-            navigate('/my-product')
+            navigate("/my-product");
           })
           .catch((error) => {
             console.log(error.code);

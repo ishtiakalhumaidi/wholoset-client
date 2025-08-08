@@ -28,26 +28,25 @@ const Top = ({ category }) => {
         <button className="btn btn-outline btn-sm">View More</button>
       </div>
 
-   <Swiper
-    modules={[Navigation]}
-    spaceBetween={20}
-    slidesPerView={1}
-    autoHeight={false}
-    breakpoints={{
-      640: { slidesPerView: 2 },
-      768: { slidesPerView: 3 },
-      1024: { slidesPerView: 4 },
-    }}
-    navigation
-   
-    className="!px-2 custom-swiper-nav"
-  >
-    {products.map((product) => (
-      <SwiperSlide key={product._id}  >
-        <ProductCard product={product} />
-      </SwiperSlide>
-    ))}
-  </Swiper>
+      <Swiper
+        modules={[Navigation]}
+        spaceBetween={20}
+        slidesPerView={1}
+        autoHeight={false}
+        breakpoints={{
+          640: { slidesPerView: 2 },
+          768: { slidesPerView: 3 },
+          1024: { slidesPerView: 4 },
+        }}
+        navigation
+        className="!px-2 custom-swiper-nav"
+      >
+        {products.map((product) => (
+          <SwiperSlide key={product._id}>
+            <ProductCard product={product} />
+          </SwiperSlide>
+        ))}
+      </Swiper>
     </div>
   );
 };

@@ -5,11 +5,14 @@ import { FaTrashAlt } from "react-icons/fa";
 import { AuthContext } from "../contexts/AuthContext";
 import { Link } from "react-router";
 import useCartProductsApi from "../api/useCartProductsApi";
+import Loader from "../components/common/Loader";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
   const { getCartProducts } = useCartProductsApi();
   const [subtotal, setSubtotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const {
     register,
     handleSubmit,
@@ -23,8 +26,8 @@ const CartPage = () => {
 
   const [cartProducts, setCartProducts] = useState([]);
 
-  const shipping = 29;
-  const tax = 4;
+  const shipping = subtotal == 0 ? 0 : 6;
+  const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
   console.log(cartProducts);
 
@@ -44,14 +47,15 @@ const CartPage = () => {
 
   useEffect(() => {
     if (!user?.email) return;
-
+    setLoading(true);
     const fetchCart = async () => {
       const data = await getCartProducts(user.email);
       setCartProducts(data);
+      setLoading(false);
     };
 
     fetchCart();
-  }, [user]);
+  }, [user?.email]);
 
   const handleIncreaseDecrease = (data) => {
     console.log(data);
@@ -67,7 +71,9 @@ const CartPage = () => {
         console.error("An error occurred", err);
       });
   };
-
+  if (loading) {
+    return <Loader />;
+  }
   return (
     <div className="grid md:grid-cols-3 gap-6 p-6 bg-base-100">
       <title>Your Cart | Wholoset</title>

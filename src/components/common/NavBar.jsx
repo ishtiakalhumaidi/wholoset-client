@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import { LuArrowUpRight } from "react-icons/lu";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
@@ -13,25 +14,25 @@ import useCartProductsApi from "../../api/useCartProductsApi";
 const NavBar = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { getCartProducts } = useCartProductsApi();
   const { user, logOut, isLoading } = useContext(AuthContext);
-  const [cartProducts, setCartProducts] = useState([]);
-  const [total, setTotal] = useState(0);
+  const { getCartProducts } = useCartProductsApi();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!cartProducts || cartProducts.length === 0) {
-      setTotal(0);
-      return;
-    }
+  // Use TanStack Query to fetch cart products
+  const { data: cartProducts = [], isLoading: cartLoading } = useQuery({
+    queryKey: ["cartProducts", user?.email],
+    queryFn: () => getCartProducts(user.email),
+    enabled: !!user?.email && !isLoading,
+    staleTime: 5 * 60 * 1000, // 5 minutes cache
+    cacheTime: 10 * 60 * 1000,
+  });
 
-    const newTotal = cartProducts.reduce((sum, element) => {
-      if (!element) return sum;
-      return sum + element.price * element.quantity;
-    }, 0);
+  const total = cartProducts.reduce(
+    (sum, p) => sum + (p?.price || 0) * (p?.quantity || 1),
+    0
+  );
 
-    setTotal(newTotal);
-  }, [cartProducts]);
-
+  // Logout handler with SweetAlert confirmation
   const handleLogOut = () => {
     Swal.fire({
       title: "Are you sure?",
@@ -46,31 +47,20 @@ const NavBar = () => {
         logOut()
           .then(() => {
             Swal.fire({
-              title: "Sign out!",
+              title: "Signed out!",
               confirmButtonColor: "#34c38f",
               text: "Sign out successfully",
               icon: "success",
             });
+            queryClient.clear(); // Clear all queries on logout to reset cache
             navigate("/");
           })
           .catch((error) => {
-            console.log(error.code);
+            console.error(error);
           });
       }
     });
   };
-
-  useEffect(() => {
-    if (!user?.email || isLoading) return;
-
-    getCartProducts(user.email)
-      .then((data) => {
-        setCartProducts(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching cart products:", error);
-      });
-  }, [user, getCartProducts, isLoading]);
 
   const navLinks = (
     <>
@@ -149,7 +139,7 @@ const NavBar = () => {
                   <div className="indicator">
                     <FiShoppingCart className="text-2xl" />
                     <span className="badge badge-sm indicator-item bg-primary text-white border-none">
-                      {cartProducts?.length || 0}
+                      {cartProducts.length || 0}
                     </span>
                   </div>
                 </div>
@@ -160,14 +150,14 @@ const NavBar = () => {
                   <div className="card-body space-y-2">
                     <div className="flex justify-between items-center">
                       <span className="font-semibold text-base-content text-lg">
-                        {cartProducts?.length || 0} Items
+                        {cartProducts.length || 0} Items
                       </span>
                       <span className="text-sm text-accent">
                         Subtotal: <strong>${total.toFixed(2)}</strong>
                       </span>
                     </div>
-                    <ul className="text-sm text-base-content space-y-1">
-                      {cartProducts?.length > 0 ? (
+                    <ul className="text-sm text-base-content space-y-1 max-h-40 overflow-auto">
+                      {cartProducts.length > 0 ? (
                         cartProducts.map((cartProduct) =>
                           cartProduct ? (
                             <li

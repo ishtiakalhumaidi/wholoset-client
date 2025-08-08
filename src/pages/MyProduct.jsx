@@ -5,12 +5,14 @@ import { useForm } from "react-hook-form";
 import Swal from "sweetalert2";
 import { Link } from "react-router";
 import useMyProducts from "../api/useMyProductsApi";
+import Loader from "../components/common/Loader";
 
 const MyProduct = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const { user } = useContext(AuthContext);
   const { getMyProducts } = useMyProducts();
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const {
     register,
     handleSubmit,
@@ -107,14 +109,21 @@ const MyProduct = () => {
 
   useEffect(() => {
     if (!user || !user.email) return;
+
     getMyProducts(user.email)
       .then((data) => {
         setProducts(data);
+        setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching products:", error);
+        setLoading(false);
       });
   }, [user, getMyProducts]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
