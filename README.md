@@ -9,7 +9,6 @@ Wholoset is a full-stack global **B2B wholesale platform** that connects manufac
 ## 🚀 Key Features
 
 ### ✅ General Features
-- 🔐 Secure authentication with Firebase (Email/Password + Google login)
 - 🛡️ JWT-based private route protection
 - 🌐 Responsive design (mobile, tablet, desktop)
 - 🎨 Elegant and professional UI using Tailwind CSS + DaisyUI
