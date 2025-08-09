@@ -17,6 +17,7 @@ import UserProfile from "../pages/UserProfile";
 import Terms from "../pages/Terms";
 import Privacy from "../pages/Privacy";
 import DashboardLayout from "../layouts/DashboardLayout";
+import AboutUs from "../pages/AboutUs";
 
 export const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
       {
         path: "sign-up",
         Component: SignUp,
+      },
+      {
+        path: "about",
+        Component: AboutUs,
       },
       {
         path: "category/:name",

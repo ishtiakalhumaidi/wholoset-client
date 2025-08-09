@@ -70,21 +70,24 @@ const NavBar = () => {
       <li>
         <NavLink to={"/all-product"}>All product</NavLink>
       </li>
-      <li>
-        <NavLink to={"/add-Product"}>Add Product</NavLink>
-      </li>
       {user && (
-        <li>
-          <NavLink to={"/My-product"}>My product</NavLink>
-        </li>
-      )}
+        <>
+          <li>
+            <NavLink to={"/add-Product"}>Add Product</NavLink>
+          </li>
+          <li>
+            <NavLink to={"/My-product"}>My product</NavLink>
+          </li>
+        </>
+      )}{" "}
+      <li>
+        <NavLink to={"/about"}>About Us</NavLink>
+      </li>
     </>
   );
 
   return (
-    <div
-      className={` fixed w-full top-0 z-[50] `}
-    >
+    <div className={` fixed w-full top-0 z-[50] `}>
       <Slide direction="down" cascade triggerOnce>
         <div className="bg-base-300 rounded-b-4xl sm:rounded-b-full relative z-[50]">
           <div className="navbar w-11/12 mx-auto">
