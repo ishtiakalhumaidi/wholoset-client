@@ -6,18 +6,13 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-import {
-  Navigation,
-  Pagination,
-  Mousewheel,
-  Keyboard,
-} from "swiper/modules";
+import { Navigation, Pagination, Mousewheel, Keyboard } from "swiper/modules";
 import { IoArrowDown } from "react-icons/io5";
 
 const Banner = () => {
   return (
-    <div>
-      <div className="relative bg-gray-900 z-[10] pointer-events-auto">
+    <div className="-mt-18 ">
+      <div className="relative pt-18 bg-gray-900 z-[10] pointer-events-auto">
         <div className="absolute inset-x-0 bottom-0">
           <svg
             viewBox="0 0 224 12"
@@ -82,8 +77,8 @@ const Banner = () => {
                       Apparel Bundles at $2.99/Unit!
                     </h1>
                     <p className="mt-6 mb-8 text-lg sm:mb-12 text-gray-300">
-                      Premium tees, jackets & uniforms. Limited stock, min order:
-                      50 units.
+                      Premium tees, jackets & uniforms. Limited stock, min
+                      order: 50 units.
                     </p>
                     <div className="flex flex-col space-y-4 sm:items-center sm:justify-center sm:flex-row sm:space-y-0 sm:space-x-4 lg:justify-start">
                       <a

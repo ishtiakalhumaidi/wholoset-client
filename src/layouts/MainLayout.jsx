@@ -11,7 +11,7 @@ const MainLayout = () => {
       <header>
         <NavBar />
       </header>
-      <main>
+      <main className="pt-18">
         <Outlet />
       </main>
       <footer>

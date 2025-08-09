@@ -5,6 +5,7 @@ import Categories from "./Categories";
 import WhyChoose from "./WhyChoose";
 import ProductCard from "../../components/ui/ProductCard";
 import TopProducts from "./topSection/TopProducts";
+import FAQ from "./FAQ";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
       <Categories />
       <TopProducts />
       <WhyChoose />
+      <FAQ/>
     </div>
   );
 };

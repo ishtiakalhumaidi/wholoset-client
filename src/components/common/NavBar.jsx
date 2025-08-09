@@ -83,9 +83,7 @@ const NavBar = () => {
 
   return (
     <div
-      className={`${
-        location.pathname === "/" ? "bg-gray-900" : "bg-base-100"
-      } relative z-[50]`}
+      className={` fixed w-full top-0 z-[50] `}
     >
       <Slide direction="down" cascade triggerOnce>
         <div className="bg-base-300 rounded-b-4xl sm:rounded-b-full relative z-[50]">
