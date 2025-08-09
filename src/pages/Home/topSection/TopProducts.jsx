@@ -18,10 +18,10 @@ const TopProducts = () => {
 
       {/* Section Block */}
       <div className="space-y-16">
-       
+        <Top category={"New Arrival"} />
+        <Top category={"Trending"} />
         <Top category={"Offers"} />
         <Top category={"Rating"} />
-     
       </div>
     </div>
   );

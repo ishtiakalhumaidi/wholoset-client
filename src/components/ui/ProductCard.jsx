@@ -9,6 +9,7 @@ const ProductCard = ({ product }) => {
     description,
     image,
     minQuantity,
+    mainQuantity,
     name,
     price,
     rating,
@@ -18,7 +19,12 @@ const ProductCard = ({ product }) => {
 
   return (
     <div className="max-w-sm rounded-xl overflow-hidden shadow-lg bg-base-100 border border-base-300 hover:scale-103 duration-700 my-2 flex flex-col justify-between p-4">
-      <figure>
+      <figure className="relative">
+        {mainQuantity < minQuantity && (
+          <div className="badge absolute top-3 left-3 badge-error">
+            Sold Out
+          </div>
+        )}
         <img
           src={image}
           alt="Product Image"

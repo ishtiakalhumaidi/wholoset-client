@@ -64,7 +64,6 @@ const ProductDetails = () => {
     },
   });
 
-
   const addToCartMutation = useMutation({
     mutationFn: (data) =>
       axios.patch(
@@ -91,11 +90,11 @@ const ProductDetails = () => {
     },
   });
 
-
   const purchaseMutation = useMutation({
     mutationFn: (purchaseData) =>
       axios.patch(
-        `https://wholoset-server.vercel.app/users/buy?email=${user.email}`,
+        `
+https://wholoset-server.vercel.app/users/buy?email=${user.email}`,
         purchaseData
       ),
     onSuccess: () => {

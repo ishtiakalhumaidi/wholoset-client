@@ -16,6 +16,7 @@ import MyOrder from "../pages/MyOrder";
 import UserProfile from "../pages/UserProfile";
 import Terms from "../pages/Terms";
 import Privacy from "../pages/Privacy";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 export const router = createBrowserRouter([
   {
@@ -108,5 +109,14 @@ export const router = createBrowserRouter([
         Component: Privacy,
       },
     ],
+  },
+  {
+    path: "dashboard",
+    element: (
+      <PrivateRoute>
+        <DashboardLayout />
+      </PrivateRoute>
+    ),
+    errorElement: <Error404 />,
   },
 ]);

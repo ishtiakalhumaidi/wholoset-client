@@ -13,7 +13,8 @@ const Top = ({ category }) => {
   useEffect(() => {
     axios
       .get(
-        `https://wholoset-server.vercel.app/top-products?category=${category.toLowerCase()}`
+        `
+https://wholoset-server.vercel.app/top-products?category=${category.toLowerCase()}`
       )
       .then((res) => {
         setProducts(res.data);
@@ -25,10 +26,12 @@ const Top = ({ category }) => {
   return (
     <div className="mb-16">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-semibold text-primary">Top {category}</h3>
-        <Link to={"/all-product"} className="btn btn-outline btn-sm">
+        <h3 className="text-2xl font-semibold text-primary">
+          {category == "New Arrival" ? category : `Top ${category}`}{" "}
+        </h3>
+        {/* <Link to={"/all-product"} className="btn btn-outline btn-sm">
           View More
-        </Link>
+        </Link> */}
       </div>
 
       <Swiper
